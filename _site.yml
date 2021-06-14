@@ -1,0 +1,12 @@
+name: "SICSS Oxford - Introduction to geospatial data and analysis"
+author: "Tobias Rüttenauer"
+date: "June 19, 2021"
+navbar:
+  title: "SICSS Oxford - Spatial"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Part 1: Using and linking spatial data"
+      href: SICSS-spatial_part1.html
+    - text: "Part 2: Analysing spatial data"
+      href: SICSS-spatial_part2.html  

@@ -1,0 +1,17 @@
+---
+title: "Part 2: Analysing spatial data"
+author: "Tobias Rüttenauer"
+date: "June 19, 2021"
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 2
+theme: united
+bibliography: sicss-spatial.bib
+link-citations: yes
+---
+
+More about this website.
