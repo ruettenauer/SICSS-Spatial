@@ -16,8 +16,8 @@ link-citations: yes
 
 ### Required packages
 
-```{r}
-pkgs <- c("sf", "mapview")
+```{r, echo = FALSE}
+pkgs <- c("sf", "mapview", "nngeo", "rnaturalearth", "dplyr") 
 lapply(pkgs, require, character.only = TRUE)
 ```
 
@@ -42,7 +42,7 @@ In general, spatial data is structured like conventional data (e.g. data.frames,
 
 ### Coordinate reference system (CRS)
 
-In its raw form, a pair of coordinates consists of two numerical values. For instance, the pair `c(51.753135871732624, -1.2617541317766832)` describes the location of Nuffield College in Oxford (one point). The fist number gives us the latitude (north-south direction), the second number gives us the longitude (west-east direction), both in decimal degrees.
+In its raw form, a pair of coordinates consists of two numerical values. For instance, the pair `c(51.752595, -1.262801)` describes the location of Nuffield College in Oxford (one point). The fist number gives us the latitude (north-south direction), the second number gives us the longitude (west-east direction), both in decimal degrees.
 
 ![Figure: Latitude and longitude, Source: [Wikipedia](https://en.wikipedia.org/wiki/Geographic_coordinate_system)](fig/lat-long.png)
 
@@ -53,10 +53,7 @@ However, we need to specify a reference point for latitudes and longitudes (in t
 However, different data providers use different CRS. For instance, spatial data in the UK usually uses 'OSGB 1936 / British National Grid' ([EPSG:27700](https://epsg.io/27700)). Here, coordinates are in meters, and projected onto a planar 2D space. Generally, every provider of spatial data should specify which reference system they use, as using the correct reference system and projection is important for plotting and transforming spatial data, as well as for measuring distances. If you do not know the correct CRS, try starting with some standards, like [EPSG:4326](https://epsg.io/4326) in case you have decimal degree like coordinates, or try searching for the source in CRS libraries, like https://epsg.io/. However, you must check if the projected coordinates match their real location, e.g. using `mpaview()`.
 
 ```{r}
-library(sf)
-library(mapview)
-
-# Coordinate paris of two locations
+# Coordinate pairs of two locations
 coords1 <- c(51.752595, -1.262801)
 coords2 <- c(51.753237, -1.253904)
 coords <- rbind(coords1, coords2)
@@ -69,7 +66,8 @@ nuffield.df <- data.frame(name = c("Nuffield College", "Radcliffe Camera"),
 head(nuffield.df)
 
 # Combine to spatial data frame
-nuffield.spdf <- st_as_sf(nuffield.df, coords = c("lon", "lat"), 
+nuffield.spdf <- st_as_sf(nuffield.df, 
+                          coords = c("lon", "lat"), # Order is important
                           crs = 4326) # EPSG number of CRS
 
 # Map
@@ -78,12 +76,249 @@ mapview(nuffield.spdf, zcol = "name")
 
 #### Why do we need different reference systems?
 
+By now, (most) people agree that the earth is not flat. So, to plot data on a 2D planar surface and to perform certain operations on a planar world, we need to make some re-projections. Depending on where we are, different re-projections of our data might work better than others.
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+st_crs(world)
+
+# Extract a country and plot in current CRS (WGS84)
+ger.spdf <- world[world$name == "Germany", ]
+plot(st_geometry(ger.spdf))
+
+# Now, lets transform Germany into a CRS optimized for Iceland
+ger_rep.spdf <- st_transform(ger.spdf, crs = 5325)
+plot(st_geometry(ger_rep.spdf))
+
+```
+
+Depending on the angle, a 2D projection of the earth looks different. It is important to choose a suitable projection for the available spatial data.
+
+
+### Importing some real word data
+
+`sf` imports many of the most common spatial data files, like geojson, gpkg, or shp. 
+
+#### London shape file (polygon data)
+
+Lets get some administrative boundaries for London from the [London Datastore](https://data.london.gov.uk/dataset/statistical-gis-boundary-files-london) 
+```{r}
+# Create subdir 
+dn <- "_data"
+ifelse(dir.exists(dn), "Exists", dir.create(dn))
+
+# Download zip file and unzip
+tmpf <- tempfile()
+boundary.link <- "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/9ba8c833-6370-4b11-abdc-314aa020d5e0/statistical-gis-boundaries-london.zip"
+download.file(boundary.link, tmpf)
+unzip(zipfile = tmpf, exdir = paste0(dn))
+unlink(tmpf)
+
+# We only need the MSOA layer for now
+msoa.spdf <- st_read(dsn = paste0(dn, "/statistical-gis-boundaries-london/ESRI"),
+                     layer = "MSOA_2011_London_gen_MHW" # Note: no file ending, as all of them are required
+                     )
+head(msoa.spdf)
+```
+
+This looks like a conventional `data.frame` but has the additional column `geometry` containing the coordinates of each observation. `st_geometry()` returns only the geographic object and `st_drop_geometry()` only the `data.frame` without the coordinates. We can plot the object using `mapview()`.
+
+```{r}
+mapview(msoa.spdf[, "POPDEN"])  
+```
+
+<!-- And we add income estimates (https://data.london.gov.uk/dataset/ons-model-based-income-estimates--msoa) -->
+
+<!-- ```{r} -->
+
+<!-- # Download excel file (why...??) -->
+<!-- econ.link <- "http://data.london.gov.uk/download/ons-model-based-income-estimates--msoa/ad11a43a-048b-437c-9f7e-116df59eb811/ons-model-based-income-estimates-msoa.xls" -->
+<!-- econ.df <- gdata::read.xls(econ.link, sheet = 2) # this only works with http, not with https -->
+<!-- names(econ.df) <- gsub("\\.\\.+", "", names(econ.df)) -->
+<!-- econ.df[, 7:ncol(econ.df)] <- sapply(econ.df[, 7:ncol(econ.df)],  -->
+<!--                                      FUN = function(x) as.numeric(gsub(",", "", x))) -->
+
+<!-- # Merge (as with conventional df) -->
+<!-- msoa.spdf <- merge(msoa.spdf, econ.df,  -->
+<!--                    by.x = "MSOA11CD", by.y = "MSOA.code",  -->
+<!--                    all.x = TRUE, all.y = FALSE) -->
+
+<!-- mapview(msoa.spdf[, "Total.annual.income"])   -->
+<!-- ``` -->
+
+And we add the median housing prices in 2017 from the [London Datastore](https://data.london.gov.uk/dataset/average-house-prices)
+
+```{r}
+
+# Download
+hp.link <- "https://data.london.gov.uk/download/average-house-prices/bdf8eee7-41e1-4d24-90ce-93fe5cf040ae/land-registry-house-prices-MSOA.csv"
+hp.df <- read.csv(hp.link)
+hp.df <- hp.df[which(hp.df$Measure == "Median" & 
+                       hp.df$Year == "Year ending Sep 2017"), ]
+hp.df$Value <- as.numeric(hp.df$Value)
+
+# Merge (as with conventional df)
+msoa.spdf <- merge(msoa.spdf, hp.df,
+                   by.x = "MSOA11CD", by.y = "Code",
+                   all.x = TRUE, all.y = FALSE)
+
+mapview(msoa.spdf[, "Value"])
+```
 
 
 
-### Spatial data manipulation
+#### Tree cover density (gridded data)
 
-https://cran.r-project.org/web/packages/sf/vignettes/sf3.html
+The London Tree Canopy Cover data provides data on tree coverage in London based on high-resolution imagery and machine learning techniques, again available at [London Datastore](https://data.london.gov.uk/dataset/curio-canopy), 
 
-https://cran.r-project.org/web/packages/sf/vignettes/sf4.html
+```{r}
+# Download zip shapefile
+tmpf <- tempfile()
+trees.link <- "https://data.london.gov.uk/download/curio-canopy/4fd54ef7-195f-43dc-a0d1-24e96e876f6c/shp-hexagon-files.zip"
+download.file(trees.link, tmpf)
+unzip(zipfile = tmpf, exdir = paste0(dn))
+trees.spdf <- st_read(dsn = paste0(dn, "/shp-hexagon-files"),
+                      layer = "gla-canopy-hex")
+unlink(tmpf)
+
+mapview(trees.spdf[, "canopy_per"])  
+```
+
+#### Cultural venues in London (point data)
+
+Environmental features might be important for housing prices, but - obviously - what counts are the number of proximate pubs? So, lets get some info on cultural venues, again from [London Datastore](https://data.london.gov.uk/dataset/cultural-infrastructure-map).
+
+```{r}
+culture.link <- "https://data.london.gov.uk/download/cultural-infrastructure-map/bf7822ed-e90a-4773-abef-dda6f6b40654/CulturalInfrastructureMap.gpkg"
+
+# This time, we have Geopackage format (gpkg)
+tmpf <- tempfile(fileext = ".gpkg")
+download.file(culture.link, destfile = tmpf, mode = "wb")
+
+# And we only load the layer containig pubs
+st_layers(tmpf)
+pubs.spdf <- st_read(dsn = tmpf, layer = "Pubs")
+unlink(tmpf)
+
+mapview(st_geometry(pubs.spdf)) 
+```
+
+
+
+### Spatial data manipulation and linkage
+
+Having data with geo-spatial information allows to perform a variety of methods to manipulate and link different data sources. Commonly used methods include 1) subsetting, 2) point-in-polygon operations, 3) distance measures, 4) intersections or buffer methods.
+
+The [online Vignettes of the sf package](https://r-spatial.github.io/sf/articles/) provide a comprehensive overview of the multiple ways of spatial manipulations. 
+
+
+#### Check if data is on common projection
+
+```{r}
+st_crs(msoa.spdf) == st_crs(trees.spdf)
+st_crs(trees.spdf) == st_crs(pubs.spdf) 
+
+# MSOA in different crs --> transform
+msoa.spdf <- st_transform(msoa.spdf, crs = st_crs(trees.spdf))
+
+```
+
+#### Subsetting
+
+We can subset spatial data in a similar way as we can with conventional data. For instance, lets find all pubs in Westminster.
+
+```{r}
+# Subset msoa and combine to one unit
+westminster.spdf <- msoa.spdf[msoa.spdf$LAD11NM == "Westminster",]
+westminster.spdf <- st_union(westminster.spdf)
+
+# Subset to points in this area
+sub1.spdf <- pubs.spdf[westminster.spdf, ] # or:
+sub1.spdf <- st_filter(pubs.spdf, westminster.spdf)
+mapview(sub1.spdf)
+
+```
+
+Or we can reverse the above and exclude all intersecting pubs by specifying `st_disjoint` as alternative spatial operator in the `op =` option (note the empty space for column selection). `st_filter` with the `.predicate` option does the same job.
+
+```{r}
+# Subset to points not in this area
+sub2.spdf <- pubs.spdf[westminster.spdf, , op = st_disjoint] # or:
+sub2.spdf <- st_filter(pubs.spdf, westminster.spdf, .predicate = st_disjoint)
+mapview(list(sub1.spdf, sub2.spdf), col.regions = list("red", "blue"))
+
+```
+
+#### Point in polygon
+
+We might be interested in the number of pubs in each MSOA. So we count the number of points in each polygon.
+
+```{r}
+# Assign MSOA to each point
+pubs_msoa.join <- st_join(pubs.spdf, msoa.spdf, join = st_within)
+
+# Count N by MSOA code (drop geometry to speed up)
+pubs_msoa.join <- dplyr::count(st_drop_geometry(pubs_msoa.join), 
+                               MSOA11CD = pubs_msoa.join$MSOA11CD,
+                               name = "pubs_count") 
+sum(pubs_msoa.join$pubs_count)
+
+# Merge and replace NAs with zero (no matches, no pubs)
+msoa.spdf <- merge(msoa.spdf, pubs_msoa.join, 
+                   by = "MSOA11CD", all.x = TRUE)
+msoa.spdf$pubs_count[is.na(msoa.spdf$pubs_count)] <- 0
+
+```
+
+#### Distance measures
+
+We might be interested in the distance to the nearest forest / green area. Here, we use the package `nngeo` to find k nearest neighbours with the respective distance.
+
+```{r}
+hist(trees.spdf$canopy_per)
+
+# Select areas with at least 50% tree coverage
+trees_high.spdf <- trees.spdf[trees.spdf$canopy_per >= 50, ]
+mapview(trees_high.spdf[, "canopy_per"])
+
+# Use geometric centroid of each MSOA
+cent.sp <- st_centroid(msoa.spdf[, "MSOA11CD"])
+
+# Get K nearest neighbour with distance
+knb.dist <- st_nn(cent.sp, trees_high.spdf, 
+                  k = 1, returnDist = TRUE,
+                  progress = FALSE)
+msoa.spdf$dist_trees50 <- unlist(knb.dist$dist)
+summary(msoa.spdf$dist_trees50)
+
+```
+
+
+#### Intersection / Buffer related methods
+
+We might also be interested in the average tree cover density within 1 km radius around each MSOA centroid. Therefore, we first create a buffer with `st_buffer()` around each midpoint and subsequently use `st_inter()`.
+
+```{r}
+# Create buffer (1km radius)
+cent.buf <- st_buffer(cent.sp, dist = 1000)
+mapview(cent.buf)
+
+# Calculate intersection between buffers and tree-cover hexagons
+buf_hex.int <- st_intersection(cent.buf, trees.spdf)
+dim(buf_hex.int)
+
+# We could also calculate the area of overlap for each pair (to calculate weighted averages)
+buf_hex.int$area <- as.numeric(st_area(buf_hex.int))
+
+# Or we just use the simple average per each MSOA
+buf_hex.int <- aggregate(list(canopy_per = buf_hex.int$canopy_per),
+                         by = list(MSOA11CD = buf_hex.int$MSOA11CD),
+                         mean)
+
+# Merge back to spatial data.frame
+msoa.spdf <- merge(msoa.spdf, buf_hex.int, by = "MSOA11CD", all.x = TRUE)
+
+
+```
 

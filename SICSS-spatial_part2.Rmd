@@ -14,4 +14,17 @@ bibliography: sicss-spatial.bib
 link-citations: yes
 ---
 
-More about this website.
+### Required packages
+
+```{r}
+pkgs <- c("sf", "mapview", "spdep", "spatialreg")
+lapply(pkgs, require, character.only = TRUE)
+```
+
+### Session info
+
+```{r}
+sessionInfo()
+```
+
+### Coordinates
