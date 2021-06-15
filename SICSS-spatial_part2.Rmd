@@ -14,10 +14,17 @@ bibliography: sicss-spatial.bib
 link-citations: yes
 ---
 
+\newcommand{\Exp}{\mathrm{E}}
+\newcommand\given[1][]{\:#1\vert\:}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\rank}{\mathrm{rank}}
+\newcommand{\bm}[1]{\boldsymbol{\mathbf{#1}}}
+
 ### Required packages
 
-```{r}
-pkgs <- c("sf", "mapview", "spdep", "spatialreg")
+```{r, message = FALSE, warning = FALSE, results = 'hide'}
+pkgs <- c("sf", "mapview", "spatialreg", "spdep", "tmap", "viridisLite")
 lapply(pkgs, require, character.only = TRUE)
 ```
 
@@ -27,4 +34,357 @@ lapply(pkgs, require, character.only = TRUE)
 sessionInfo()
 ```
 
-### Coordinates
+### Load spatial data
+
+See previous file.
+
+```{r}
+load("msoa_spatial.RData")
+```
+
+### Spatial interdependence
+
+We can not only use coordinates and geo-spatial information to connect different data sources, we can also explicitly model spatial (inter)depence in the analysis of our data. In many instance, accounting for spatial dependence might even be necessary to avoid biased point estimates and standard errors. The reason is our observations are often not independent and identically distributed: 'everything is related to everything else, but near things are more related than distant things' [@Tobler.1970.0].
+
+However, even if we would receive unbiased estimates with conventional methods, using the spatial information inherent in the data can help us detect specific patterns and spatial relations. 
+
+### ${\bm W}$: Connectivity between units
+
+To analyse spatial relations, we first need to define some sort of connectivity between units (e.g. similar to network analysis). There is an ongoing debate about the importance of spatial weights for spatial econometrics and about the right way to specify weights matrices [@LeSage.2014.0b, @Neumayer.2016.0]. The following graph shows some possible options in how to define connectivity between units.
+
+![Figure: Spatial data linkage, Source: @Bivand.2018.748](fig/Bivand_neighbours.png)
+
+In spatial econometrics, the spatial connectivity (as shown above) is usually represented by a spatial weights matrix ${\bm W}$:
+$$
+\begin{equation} 
+		\bm W = \begin{bmatrix} 
+    		w_{11} & w_{12} & \dots & w_{1n} \\
+    		w_{21} & w_{22} & \dots & w_{2n} \\
+    		\vdots & \vdots & \ddots & \vdots \\
+    		w_{n1} & w_{n2} & \dots     & w_{nn} 
+    		\end{bmatrix}
+		\end{equation}
+$$
+Note: The diagonal elements $w_{i,i}= w_{1,1}, w_{2,2}, \dots, w_{n,n}$  of $\bm W$	are always zero. No unit is a neighbour of itself.
+
+#### Contiguity weights
+
+A very common type of spatial weights. Binary specification, taking the value 1 for neighbouring units (queens: sharing a common edge; rook: sharing a common border), and 0 otherwise.
+
+Contiguity weights $w_{i,j} =$
+
+* 1 if $i$ and $j$ neighbours
+
+* 0 \text{otherwise}
+
+$$
+		\begin{equation} 
+		\bm W  = \begin{bmatrix} 
+    		0 & 0 & 1  \\
+    		0 & 0 & 0  \\
+    		1 & 0 & 0  
+    		\end{bmatrix} 	\nonumber
+		\end{equation}
+$$
+
+* Sparse matrices
+
+* Problem of `island' (units without neighbours)
+
+Lets create a contiguity weights matrix (Queens neighbours) for the London MSOAs. Therefore, we create a neighbours list (`nb`), which is an efficient way of storing ${\bm W}$.
+
+```{r}
+# Contiguity (Queens) neighbours weights
+queens.nb <- poly2nb(msoa.spdf, 
+                     queen = TRUE, 
+                     snap = 10) # Snap specifies that we consider points in 10m distance 'as touching'
+summary(queens.nb)
+
+# Lets plot that
+plot(st_geometry(msoa.spdf), border = "grey60")
+plot(queens.nb, st_centroid(st_geometry(msoa.spdf)), 
+     add = TRUE, pch = 19, cex = 0.6)
+
+# We can also transform this into the matrix
+W <- nb2mat(queens.nb, style = "B")
+print(W[1:10, 1:10])
+```
+
+
+#### Distance based weights
+
+Another common type uses the distance $d_{ij}$ between each unit $i$ and $j$.
+
+* Inverse distance weights $w_{i,j} =  \frac{1}{d_{ij}}$
+
+$$
+		\begin{equation} 
+		\bm W = \begin{bmatrix} 
+    		0 & \frac{1}{d_{ij}} & \frac{1}{d_{ij}}  \\
+    		\frac{1}{d_{ij}} & 0 & \frac{1}{d_{ij}}  \\
+    		\frac{1}{d_{ij}} & \frac{1}{d_{ij}} & 0  
+    		\end{bmatrix} 	\nonumber
+		\end{equation}
+$$		
+
+* Dense matrices
+
+* Specifying thresholds may be useful (to get rid of very small non-zero weights)
+
+For now, we will just specify a neighbours list with a distance threshold of 3km using `dnearneigh()`. An alternative would be k nearest neighbours using `knearneigh()`. We will do the inverse weighting later.
+
+```{r}
+# Crease centroids
+coords <- st_geometry(st_centroid(msoa.spdf))
+
+# Neighbours within 5km distance
+dist_3.nb <- dnearneigh(coords, d1 = 0, d2 = 3000)
+summary(dist_3.nb)
+
+# Lets plot that
+plot(st_geometry(msoa.spdf), border = "grey60")
+plot(dist_3.nb, coords, 
+     add = TRUE, pch = 19, cex = 0.6)
+
+```
+
+### Normalization of ${\bm W}$
+
+Normalizing ensures that the parameter space of the spatial multiplier is restricted to $-1 < \rho > 1$, and the multiplier matrix is non-singular. Again, how to normalize a weights matrix is subject of debate [@LeSage.2014.0b; @Neumayer.2016.0].
+	
+Normalizing your weights matrix is always a good idea. Otherwise, the spatial parameters might blow up -- if you can estimate the model at all.
+
+#### Row-normalization
+
+Row-normalization divides each non-zero weight by the sum of all weights of unit $i$, which is the sum of the row. 
+
+$$
+\frac{w_{ij}}{\sum_j^n w_{ij}}
+$$ 
+		
+* Spatial lags are average values of neighbours
+
+* Proportions between units (distance based) get lost
+
+* Can induce asymmetries: $w_{ij} \neq w_{ji}$ 
+
+For instance, we can use row-normalization for the Queens neighbours created above, and create a neighbours list with spatial weights
+
+```{r}
+queens.lw <- nb2listw(queens.nb,
+                      style = "W") # W ist row-normalization
+summary(queens.lw)
+```
+
+	
+#### Maximum eigenvalues normalization
+
+Maximum eigenvalues normalization: Divide each non-zero weight by overall maximum eigenvalue $\lambda_{max}$. Each element of $\bm W$ is divided by the same scalar parameter. 
+		 
+$$
+\frac{\bm W}{\lambda_{max}}
+$$
+
+* Interpretation may become more complicated
+
+* Keeps proportions of connectivity strengths across units (relevant esp. for distance based $\bm W$)
+
+For instance, we can use eigenvalue normalization for the inverse distance neighbours. We use `nb2listwdist()` to create weight by inverse distance and normalize in one step.
+
+```{r}
+idw.lw <- nb2listwdist(dist_3.nb,
+                       x = coords, # needed for idw
+                       type = "idw", # inverse distance weighting
+                       alpha = 1, # the decay parameter for distance weighting
+                       style = "minmax") # for eigenvalue normalization
+summary(idw.lw)
+```
+
+### Spatial Autocorrelation
+
+If spatially close observations are more likely to exhibit similar values, we cannot handle observations as if they were independent.
+
+$$ 
+\Exp(\varepsilon_i\varepsilon_j)\neq \Exp(\varepsilon_i)\Exp(\varepsilon_j) = 0
+$$
+		
+This violates a basic assumption of the conventional OLS model. In consequence, ignoring spatial dependence can lead to
+		
+* biased inferential statistics
+
+* biased point estimates (depending on the DGP)
+
+#### Detection: Visualization
+
+There is one very easy and intuitive way of detecting spatial autocorrelation: Just look at the map. We do so by using `tmap` for plotting the housing values.
+
+```{r}
+mp1 <- tm_shape(msoa.spdf) +
+  tm_fill(col = "Value", 
+          #style = "cont",
+          style = "fisher", n = 8,
+          title = "Median", 
+          palette = viridis(n = 8, direction = -1, option = "C"),
+          legend.hist = TRUE) +
+  tm_borders(col = "black", lwd = 1) +
+  tm_layout(legend.frame = TRUE, legend.bg.color = TRUE,
+            #legend.position = c("right", "bottom"),
+            legend.outside = TRUE,
+            main.title = "Housing values 2017", 
+            main.title.position = "center",
+            title.snap.to.legend = TRUE) 
+
+mp1 
+```
+
+#### Detection: Moran's I
+
+Global Moran's I test statistic:
+$$		
+		\begin{equation} 
+		\bm I  = \frac{N}{S_0}	
+		\frac{\sum_i\sum_j w_{ij}(y_i-\bar{y})(y_j-\bar{y})}
+			{\sum_i (y_i-\bar{y})}, \text{where } S_0 = \sum_{i=1}^N\sum_{j=1}^N w_{ij}
+		\end{equation}
+$$		
+
+* Relation of the deviation from the mean value between unit $i$ and neighbours of unit $i$. Basically, this measures correlation between neighbouring values.
+
+* Negative values: negative autocorrelation
+
+* Around zero: no autocorrelation
+
+* Positive values: positive autocorrelation
+
+```{r}
+# Global Morans I test of housing values based on contiguity weights
+moran.test(msoa.spdf$Value, listw = queens.lw, alternative = "two.sided")
+
+# Global Morans I test of housing values based on idw
+moran.test(msoa.spdf$Value, listw = idw.lw, alternative = "two.sided")
+```
+
+### Spatial Regression Models
+
+There are a bunch of different techniques to model spatial dependence and spatial processes [@LeSage.2009.0]. Here, we will just cover a few of the most common techniques / econometric models. One advantage of the most basic spatial model (SLX) is that this method can easily be incorporated in a variety of other methodologies, such as machine learning approaches. @HalleckVega.2015.0, LeSage.2014.0, and @Ruttenauer.2019c provide article-length introductions.
+
+There are three basic ways of incorporating spatial dependece.
+
+##### Spatial Error Model (SEM)
+
+* Clustering on Unobservables
+
+$$
+		\begin{equation} 
+		\begin{split}
+		{\bm y}&=\alpha{\bm \iota}+{\bm X}{\bm \beta}+{\bm u},\\
+		{\bm u}&=\lambda{\bm W}{\bm u}+{\bm \varepsilon}
+		\end{split} 
+		\end{equation}
+$$		
+
+##### Spatial Autoregressive Model (SAR)
+
+* Interdependence
+
+$$
+    \begin{equation} 
+		{\bm y}=\alpha{\bm \iota}+\rho{\bm W}{\bm y}+{\bm X}{\bm \beta}+ {\bm \varepsilon}
+		\end{equation}  
+$$	
+
+##### Spatially lagged X Model (SLX)
+
+* Clustering on Spillovers in Covariates
+
+$$
+		\begin{equation}
+		{\bm y}=\alpha{\bm \iota}+{\bm X}{\bm \beta}+{\bm W}{\bm X}{\bm \theta}+ {\bm \varepsilon}
+		\end{equation}
+$$	
+Moreover, there are models combining two sets of the above specifications.
+
+##### Spatial Durbin Model (SDM)
+
+$$
+		\begin{equation}
+		{\bm y}=\alpha{\bm \iota}+{\bm X}{\bm \beta}+{\bm W}{\bm X}{\bm \theta}+ {\bm \varepsilon}
+		\end{equation}
+$$	
+
+##### Spatial Durbin Error Model (SDEM)
+
+$$
+    \begin{equation}
+		\begin{split}
+		{\bm y}&=\alpha{\bm \iota}+{\bm X}{\bm \beta}+{\bm W}{\bm X}{\bm \theta}+ {\bm u},\\
+		{\bm u}&=\lambda{\bm W}{\bm u}+{\bm \varepsilon}
+		\end{split}
+		\end{equation}
+$$
+
+##### Combined Spatial Autocorrelation Model (SAC)
+
+$$
+		\begin{equation}
+		\begin{split}
+		{\bm y}&=\alpha{\bm \iota}+\rho{\bm W}{\bm y}+{\bm X}{\bm \beta}+ {\bm u},\\
+		{\bm u}&=\lambda{\bm W}{\bm u}+{\bm \varepsilon}
+		\end{split}
+		\end{equation}
+$$
+
+Note that all of these models assume different data generating processes (DGP) leading to the spatial correlation or pattern we observe in the data. Although there are specifications tests, it is generally not possible to let the data decide which one is the true underlying DGP [@Cook.2015.563; @Ruttenauer.2019c]. However, there might be theoretical reasons to guide the model specification [@Cook.2015.563]. 
+
+Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies [@HalleckVega.2015.0; @Ruttenauer.2019c; @Wimpy.2021] highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.
+
+### Impacts
+
+#### Coefficient estimates $\neq$ `marginal' effects
+
+__Attention__: Do not interpret coefficients in SAR, SAC, and SDM!! Using the reduced form 
+
+$$	
+	\begin{equation}
+	\begin{split}
+		{\bm y} & =\alpha{\bm \iota}+\rho {\bm W}{\bm y}+{\bm X}{\bm \beta}+{\bm \varepsilon} \\
+		{\bm y} & =({\bm I}-\rho{\bm W})^{-1}(\alpha{\bm \iota}+{\bm X}{\bm \beta}+{\bm \varepsilon}),
+	\end{split}
+	\end{equation}
+$$	
+	
+we can calculate the first derivative:
+	
+$$	
+	\begin{equation}
+	\begin{split}
+		\frac{\partial \bm y}{\partial \bm x_k} & = ({\bm I}-\rho{\bm W})^{-1}\beta_k \\
+		& =({\bm I} + \rho{\bm W} + \rho^2{\bm W}^2 + \rho^3{\bm W}^3 + ...)\beta_k, 
+	\end{split}
+	\end{equation}	
+$$	
+	where $\rho{\bm W}\beta_k$ equals the effect stemming from direct neighbours, $\rho^2{\bm W}^2\beta_k$ the effect stemming from second order neighbours (neighbours of neighbours),... This also includes feedback loops if unit $i$ is also a second order neighbour of itself.
+
+
+#### Impacts
+
+Note that the derivatives consist of a matrix, returning individual effects for each unit on each other unit, differentialet in _direct, indirect, and total impacts_. However, these individual effects mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
+
+
+Model | Direct Impacts | Indirect Impacts 
+:-: | :-: | :-:
+OLS/SEM | $\beta_k$ | -- 
+SAR/SAC | Diagonal elements of $({\bm I}-\rho{\bm W})^{-1}\beta_k$ | Off-diagonal elements of $({\bm I}-\rho{\bm W})^{-1}\beta_k$ 
+SLX/SDEM | $\beta_k$ | $\theta_k$ 
+SDM | Diagonal elements of $({\bm I}-\rho{\bm W})^{-1}\left[\beta_k+{\bm W}\theta_k\right]$ | Off-diagonal elements of $({\bm I}-\rho{\bm W})^{-1}$
+
+The different indirect effects / spatial effects mean conceptionally different things:
+
+* Global spillover effects: SAR, SAC, SDM
+
+* Local spillover effects: SLX, SDEM
+
+
+
+
+### References

@@ -16,7 +16,7 @@ link-citations: yes
 
 ### Required packages
 
-```{r, echo = FALSE}
+```{r, message = FALSE, warning = FALSE, results = 'hide'}
 pkgs <- c("sf", "mapview", "nngeo", "rnaturalearth", "dplyr") 
 lapply(pkgs, require, character.only = TRUE)
 ```
@@ -93,7 +93,7 @@ plot(st_geometry(ger_rep.spdf))
 
 ```
 
-Depending on the angle, a 2D projection of the earth looks different. It is important to choose a suitable projection for the available spatial data.
+Depending on the angle, a 2D projection of the earth looks different. It is important to choose a suitable projection for the available spatial data. For more information on CRS and re-projection, see e.g. @Lovelace.2019.
 
 
 ### Importing some real word data
@@ -322,3 +322,11 @@ msoa.spdf <- merge(msoa.spdf, buf_hex.int, by = "MSOA11CD", all.x = TRUE)
 
 ```
 
+### Save spatial data
+
+```{r}
+save(msoa.spdf, file = "msoa_spatial.RData")
+```
+
+
+### References
