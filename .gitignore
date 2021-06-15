@@ -1,5 +1,6 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
+*.Rproj.user
+*.Rproj
+*.Rhistory
+*.RData
+*.Ruserdata
 _data/
