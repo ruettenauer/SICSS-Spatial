@@ -4,6 +4,8 @@ author: "Tobias Rüttenauer"
 date: "June 19, 2021"
 output: 
   html_document:
+    theme: flatly
+    highlight: haddock
     toc: true
     toc_float:
       collapsed: false
@@ -29,7 +31,7 @@ sessionInfo()
 
 ```
 
-### Coordinates
+# Coordinates
 
 In general, spatial data is structured like conventional data (e.g. data.frames, matrices), but add one additional dimension: every observation is linked to some type geo-spatial information. Most common types of spatial information are:
 
@@ -42,7 +44,7 @@ In general, spatial data is structured like conventional data (e.g. data.frames,
 * Raster (one coordinate pair for centroid + raster / grid size)
 
 
-### Coordinate reference system (CRS)
+## Coordinate reference system (CRS)
 
 In its raw form, a pair of coordinates consists of two numerical values. For instance, the pair `c(51.752595, -1.262801)` describes the location of Nuffield College in Oxford (one point). The fist number gives us the latitude (north-south direction), the second number gives us the longitude (west-east direction), both in decimal degrees.
 
@@ -50,7 +52,7 @@ In its raw form, a pair of coordinates consists of two numerical values. For ins
 
 However, we need to specify a reference point for latitudes and longitudes (in the Figure above: equator and Greenwich). For instance, the pair of coordinates above comes from the Google Maps, which returns GPS coordinates in 'WGS 84' ([EPSG:4326](https://epsg.io/4326)). 
 
-#### Projected CRS
+## Projected CRS
 
 However, different data providers use different CRS. For instance, spatial data in the UK usually uses 'OSGB 1936 / British National Grid' ([EPSG:27700](https://epsg.io/27700)). Here, coordinates are in meters, and projected onto a planar 2D space. Generally, every provider of spatial data should specify which reference system they use, as using the correct reference system and projection is important for plotting and transforming spatial data, as well as for measuring distances. If you do not know the correct CRS, try starting with a standards CRS like [EPSG:4326](https://epsg.io/4326) in case you have decimal degree like coordinates. If it looks like projected coordinates, try searching for the country or region in CRS libraries like https://epsg.io/. However, you must check if the projected coordinates match their real location, e.g. using `mpaview()`.
 
@@ -77,7 +79,7 @@ mapview(nuffield.spdf, zcol = "name")
 
 ```
 
-#### Why do we need different reference systems?
+## Why different projections?
 
 By now, (most) people agree that the earth is not flat. So, to plot data on a 2D planar surface and to perform certain operations on a planar world, we need to make some re-projections. Depending on where we are, different re-projections of our data might work better than others.
 
@@ -99,11 +101,11 @@ plot(st_geometry(ger_rep.spdf))
 Depending on the angle, a 2D projection of the earth looks different. It is important to choose a suitable projection for the available spatial data. For more information on CRS and re-projection, see e.g. @Lovelace.2019.
 
 
-### Importing some real word data
+# Importing some real word data
 
 `sf` imports many of the most common spatial data files, like geojson, gpkg, or shp. 
 
-#### London shape file (polygon data)
+## London shapefile (polygon)
 
 Lets get some administrative boundaries for London from the [London Datastore](https://data.london.gov.uk/dataset/statistical-gis-boundary-files-london) 
 ```{r}
@@ -174,7 +176,7 @@ mapview(msoa.spdf[, "Value"])
 
 
 
-#### Tree cover density (gridded data)
+## Tree cover (gridded)
 
 The London Tree Canopy Cover data provides data on tree coverage in London based on high-resolution imagery and machine learning techniques, again available at [London Datastore](https://data.london.gov.uk/dataset/curio-canopy), 
 
@@ -192,7 +194,7 @@ mapview(trees.spdf[, "canopy_per"])
 
 ```
 
-#### Cultural venues in London (point data)
+## Cultural venues (point)
 
 Environmental features might be important for housing prices, but - obviously - what counts are the number of proximate pubs? So, lets get some info on cultural venues, again from [London Datastore](https://data.london.gov.uk/dataset/cultural-infrastructure-map).
 
@@ -214,7 +216,7 @@ mapview(st_geometry(pubs.spdf))
 
 
 
-### Spatial data manipulation and linkage
+# Manipulation and linkage
 
 Having data with geo-spatial information allows to perform a variety of methods to manipulate and link different data sources. Commonly used methods include 1) subsetting, 2) point-in-polygon operations, 3) distance measures, 4) intersections or buffer methods.
 
@@ -232,7 +234,7 @@ msoa.spdf <- st_transform(msoa.spdf, crs = st_crs(trees.spdf))
 
 ```
 
-#### Subsetting
+## Subsetting
 
 We can subset spatial data in a similar way as we can with conventional data. For instance, lets find all pubs in Westminster.
 
@@ -258,7 +260,7 @@ mapview(list(sub1.spdf, sub2.spdf), col.regions = list("red", "blue"))
 
 ```
 
-#### Point in polygon
+## Point in polygon
 
 We might be interested in the number of pubs in each MSOA. So we count the number of points in each polygon.
 
@@ -279,7 +281,7 @@ msoa.spdf$pubs_count[is.na(msoa.spdf$pubs_count)] <- 0
 
 ```
 
-#### Distance measures
+## Distance measures
 
 We might be interested in the distance to the nearest forest / green area. Here, we use the package `nngeo` to find k nearest neighbours with the respective distance.
 
@@ -303,7 +305,7 @@ summary(msoa.spdf$dist_trees50)
 ```
 
 
-#### Intersection / Buffer related methods
+## Intersections + Buffers
 
 We might also be interested in the average tree cover density within 1 km radius around each MSOA centroid. Therefore, we first create a buffer with `st_buffer()` around each midpoint and subsequently use `st_inter()`.
 
@@ -341,4 +343,4 @@ save(msoa.spdf, file = "msoa_spatial.RData")
 ```
 
 
-### References
+# References

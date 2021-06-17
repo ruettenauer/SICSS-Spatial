@@ -18,7 +18,7 @@
 <script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -35,8 +35,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -47,17 +45,96 @@
   ul.task-list{list-style: none;}
     </style>
 
-<style type="text/css">code{white-space: pre;}</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; } /* Alert */
+code span.an { color: #008000; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #0000ff; } /* ControlFlow */
+code span.ch { color: #008080; } /* Char */
+code span.cn { } /* Constant */
+code span.co { color: #008000; } /* Comment */
+code span.cv { color: #008000; } /* CommentVar */
+code span.do { color: #008000; } /* Documentation */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.im { } /* Import */
+code span.in { color: #008000; } /* Information */
+code span.kw { color: #0000ff; } /* Keyword */
+code span.op { } /* Operator */
+code span.ot { color: #ff4000; } /* Other */
+code span.pp { color: #ff4000; } /* Preprocessor */
+code span.sc { color: #008080; } /* SpecialChar */
+code span.ss { color: #008080; } /* SpecialString */
+code span.st { color: #008080; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #008080; } /* VerbatimString */
+code span.wa { color: #008000; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -380,12 +457,12 @@ div.tocify {
 
 <div id="required-packages" class="section level3">
 <h3>Required packages</h3>
-<pre class="r"><code>pkgs &lt;- c(&quot;sf&quot;, &quot;mapview&quot;, &quot;spdep&quot;, &quot;spatialreg&quot;, &quot;tmap&quot;, &quot;viridisLite&quot;) # note: load spdep first, then spatialreg
-lapply(pkgs, require, character.only = TRUE)</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;sf&quot;</span>, <span class="st">&quot;mapview&quot;</span>, <span class="st">&quot;spdep&quot;</span>, <span class="st">&quot;spatialreg&quot;</span>, <span class="st">&quot;tmap&quot;</span>, <span class="st">&quot;viridisLite&quot;</span>) <span class="co"># note: load spdep first, then spatialreg</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(pkgs, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="session-info" class="section level3">
 <h3>Session info</h3>
-<pre class="r"><code>sessionInfo()</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <pre><code>## R version 4.1.0 (2021-05-18)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
 ## Running under: Windows 10 x64 (build 19042)
@@ -403,54 +480,42 @@ lapply(pkgs, require, character.only = TRUE)</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] viridisLite_0.4.0   tmap_3.3-1          spatialreg_1.1-8   
-##  [4] Matrix_1.3-3        spdep_1.1-8         spData_0.3.8       
-##  [7] sp_1.4-5            dplyr_1.0.6         rnaturalearth_0.1.0
-## [10] nngeo_0.4.3         mapview_2.10.0      sf_1.0-0           
+## [1] viridisLite_0.4.0 tmap_3.3-1        spatialreg_1.1-8  Matrix_1.3-3     
+## [5] spdep_1.1-8       spData_0.3.8      sp_1.4-5          mapview_2.10.0   
+## [9] sf_1.0-0         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] sass_0.4.0              jsonlite_1.7.2          splines_4.1.0          
-##  [4] gtools_3.9.2            bslib_0.2.5.1           expm_0.999-6           
-##  [7] highr_0.9               stats4_4.1.0            yaml_2.2.1             
-## [10] LearnBayes_2.15.1       pillar_1.6.1            lattice_0.20-44        
-## [13] glue_1.4.2              uuid_0.1-4              digest_0.6.27          
-## [16] RColorBrewer_1.1-2      colorspace_2.0-1        leaflet.providers_1.9.0
-## [19] htmltools_0.5.1.1       XML_3.99-0.6            pkgconfig_2.0.3        
-## [22] raster_3.4-10           stars_0.5-3             gmodels_2.18.1         
-## [25] purrr_0.3.4             scales_1.1.1            webshot_0.5.2          
-## [28] gdata_2.18.0            brew_1.0-6              svglite_2.0.0          
-## [31] satellite_1.0.2         tibble_3.1.2            proxy_0.4-26           
-## [34] generics_0.1.0          farver_2.1.0            ellipsis_0.3.2         
-## [37] leafsync_0.1.0          magrittr_2.0.1          crayon_1.4.1           
-## [40] deldir_0.2-10           evaluate_0.14           fansi_0.5.0            
-## [43] nlme_3.1-152            MASS_7.3-54             lwgeom_0.2-6           
-## [46] class_7.3-19            tools_4.1.0             lifecycle_1.0.0        
-## [49] stringr_1.4.0           munsell_0.5.0           compiler_4.1.0         
-## [52] jquerylib_0.1.4         e1071_1.7-7             systemfonts_1.0.2      
-## [55] rlang_0.4.11            tmaptools_3.1-1         classInt_0.4-3         
-## [58] units_0.7-2             grid_4.1.0              leafpop_0.1.0          
-## [61] dichromat_2.0-0         htmlwidgets_1.5.3       crosstalk_1.1.1        
-## [64] leafem_0.1.6            base64enc_0.1-3         rmarkdown_2.8          
-## [67] boot_1.3-28             codetools_0.2-18        abind_1.4-5            
-## [70] DBI_1.1.1               R6_2.5.0                knitr_1.33             
-## [73] rgeos_0.5-5             utf8_1.2.1              KernSmooth_2.23-20     
-## [76] stringi_1.6.2           parallel_4.1.0          Rcpp_1.0.6             
-## [79] vctrs_0.3.8             png_0.1-7               leaflet_2.0.4.1        
-## [82] tidyselect_1.1.1        xfun_0.23               rnaturalearthdata_0.1.0
-## [85] coda_0.19-4</code></pre>
+##  [1] sass_0.4.0         jsonlite_1.7.2     splines_4.1.0      gtools_3.9.2      
+##  [5] bslib_0.2.5.1      expm_0.999-6       stats4_4.1.0       yaml_2.2.1        
+##  [9] LearnBayes_2.15.1  pillar_1.6.1       lattice_0.20-44    glue_1.4.2        
+## [13] digest_0.6.27      RColorBrewer_1.1-2 colorspace_2.0-1   htmltools_0.5.1.1 
+## [17] XML_3.99-0.6       pkgconfig_2.0.3    raster_3.4-10      stars_0.5-3       
+## [21] gmodels_2.18.1     purrr_0.3.4        scales_1.1.1       webshot_0.5.2     
+## [25] gdata_2.18.0       satellite_1.0.2    tibble_3.1.2       proxy_0.4-26      
+## [29] generics_0.1.0     ellipsis_0.3.2     leafsync_0.1.0     magrittr_2.0.1    
+## [33] crayon_1.4.1       deldir_0.2-10      evaluate_0.14      fansi_0.5.0       
+## [37] nlme_3.1-152       MASS_7.3-54        lwgeom_0.2-6       class_7.3-19      
+## [41] tools_4.1.0        lifecycle_1.0.0    stringr_1.4.0      munsell_0.5.0     
+## [45] compiler_4.1.0     jquerylib_0.1.4    e1071_1.7-7        rlang_0.4.11      
+## [49] tmaptools_3.1-1    classInt_0.4-3     units_0.7-2        grid_4.1.0        
+## [53] dichromat_2.0-0    htmlwidgets_1.5.3  crosstalk_1.1.1    leafem_0.1.6      
+## [57] base64enc_0.1-3    rmarkdown_2.8      boot_1.3-28        codetools_0.2-18  
+## [61] abind_1.4-5        DBI_1.1.1          R6_2.5.0           knitr_1.33        
+## [65] dplyr_1.0.6        utf8_1.2.1         KernSmooth_2.23-20 stringi_1.6.2     
+## [69] parallel_4.1.0     Rcpp_1.0.6         vctrs_0.3.8        png_0.1-7         
+## [73] leaflet_2.0.4.1    tidyselect_1.1.1   xfun_0.23          coda_0.19-4</code></pre>
 </div>
 <div id="load-spatial-data" class="section level3">
 <h3>Load spatial data</h3>
 <p>See previous file.</p>
-<pre class="r"><code>load(&quot;msoa_spatial.RData&quot;)</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;msoa_spatial.RData&quot;</span>)</span></code></pre></div>
 </div>
-<div id="spatial-interdependence" class="section level3">
-<h3>Spatial interdependence</h3>
+<div id="spatial-interdependence" class="section level1">
+<h1>Spatial interdependence</h1>
 <p>We can not only use coordinates and geo-spatial information to connect different data sources, we can also explicitly model spatial (inter)depence in the analysis of our data. In many instance, accounting for spatial dependence might even be necessary to avoid biased point estimates and standard errors. The reason is our observations are often not independent and identically distributed: ‘everything is related to everything else, but near things are more related than distant things’ <span class="citation">(<a href="#ref-Tobler.1970.0" role="doc-biblioref">Tobler 1970</a>)</span>.</p>
 <p>However, even if we would receive unbiased estimates with conventional methods, using the spatial information inherent in the data can help us detect specific patterns and spatial relations.</p>
-</div>
-<div id="boldsymbolmathbfw-connectivity-between-units" class="section level3">
-<h3><span class="math inline">\({\boldsymbol{\mathbf{W}}}\)</span>: Connectivity between units</h3>
+<div id="boldsymbolmathbfw-connectivity-between-units" class="section level2">
+<h2><span class="math inline">\({\boldsymbol{\mathbf{W}}}\)</span>: Connectivity between units</h2>
 <p>To analyse spatial relations, we first need to define some sort of connectivity between units (e.g. similar to network analysis). There is an ongoing debate about the importance of spatial weights for spatial econometrics and about the right way to specify weights matrices <span class="citation"><a href="#ref-Neumayer.2016.0" role="doc-biblioref">Neumayer and Plümper</a> (<a href="#ref-Neumayer.2016.0" role="doc-biblioref">2016</a>)</span>. The following graph shows some possible options in how to define connectivity between units.</p>
 <div class="figure">
 <img src="fig/Bivand_neighbours.png" alt="" />
@@ -466,8 +531,8 @@ lapply(pkgs, require, character.only = TRUE)</code></pre>
             \end{bmatrix}
         \end{equation}
 \]</span> Note: The diagonal elements <span class="math inline">\(w_{i,i}= w_{1,1}, w_{2,2}, \dots, w_{n,n}\)</span> of <span class="math inline">\(\boldsymbol{\mathbf{W}}\)</span> are always zero. No unit is a neighbour of itself.</p>
-<div id="contiguity-weights" class="section level4">
-<h4>Contiguity weights</h4>
+<div id="contiguity-weights" class="section level3">
+<h3>Contiguity weights</h3>
 <p>A very common type of spatial weights. Binary specification, taking the value 1 for neighbouring units (queens: sharing a common edge; rook: sharing a common border), and 0 otherwise.</p>
 <p>Contiguity weights <span class="math inline">\(w_{i,j} =\)</span></p>
 <ul>
@@ -488,11 +553,11 @@ lapply(pkgs, require, character.only = TRUE)</code></pre>
 <li><p>Problem of `island’ (units without neighbours)</p></li>
 </ul>
 <p>Lets create a contiguity weights matrix (Queens neighbours) for the London MSOAs. Therefore, we create a neighbours list (<code>nb</code>), which is an efficient way of storing <span class="math inline">\({\boldsymbol{\mathbf{W}}}\)</span>.</p>
-<pre class="r"><code># Contiguity (Queens) neighbours weights
-queens.nb &lt;- poly2nb(msoa.spdf, 
-                     queen = TRUE, 
-                     snap = 1) # we consider points in 1m distance as &#39;touching&#39;
-summary(queens.nb)</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Contiguity (Queens) neighbours weights</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>queens.nb <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(msoa.spdf, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">queen =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">snap =</span> <span class="dv">1</span>) <span class="co"># we consider points in 1m distance as &#39;touching&#39;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(queens.nb)</span></code></pre></div>
 <pre><code>## Neighbour list object:
 ## Number of regions: 983 
 ## Number of nonzero links: 5620 
@@ -506,14 +571,14 @@ summary(queens.nb)</code></pre>
 ## 160 270 475 490 597 729 755 778 861 with 2 links
 ## 1 most connected region:
 ## 946 with 13 links</code></pre>
-<pre class="r"><code># Lets plot that
-plot(st_geometry(msoa.spdf), border = &quot;grey60&quot;)
-plot(queens.nb, st_centroid(st_geometry(msoa.spdf)), 
-     add = TRUE, pch = 19, cex = 0.6)</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lets plot that</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(msoa.spdf), <span class="at">border =</span> <span class="st">&quot;grey60&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(queens.nb, <span class="fu">st_centroid</span>(<span class="fu">st_geometry</span>(msoa.spdf)), </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="fl">0.6</span>)</span></code></pre></div>
 <p><img src="SICSS-spatial_part2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<pre class="r"><code># We can also transform this into the matrix
-W &lt;- nb2mat(queens.nb, style = &quot;B&quot;)
-print(W[1:10, 1:10])</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can also transform this into the matrix</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">nb2mat</span>(queens.nb, <span class="at">style =</span> <span class="st">&quot;B&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(W[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span></code></pre></div>
 <pre><code>##    [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
 ## 1     0    0    0    0    0    0    0    0    0     0
 ## 2     0    0    1    0    0    0    0    0    0     0
@@ -526,8 +591,8 @@ print(W[1:10, 1:10])</code></pre>
 ## 9     0    0    0    0    0    1    1    0    0     1
 ## 10    0    0    0    1    0    1    0    0    1     0</code></pre>
 </div>
-<div id="distance-based-weights" class="section level4">
-<h4>Distance based weights</h4>
+<div id="distance-based-weights" class="section level3">
+<h3>Distance based weights</h3>
 <p>Another common type uses the distance <span class="math inline">\(d_{ij}\)</span> between each unit <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>.</p>
 <ul>
 <li>Inverse distance weights <span class="math inline">\(w_{i,j} = \frac{1}{d_{ij}}\)</span></li>
@@ -546,13 +611,13 @@ print(W[1:10, 1:10])</code></pre>
 <li><p>Specifying thresholds may be useful (to get rid of very small non-zero weights)</p></li>
 </ul>
 <p>For now, we will just specify a neighbours list with a distance threshold of 3km using <code>dnearneigh()</code>. An alternative would be k nearest neighbours using <code>knearneigh()</code>. We will do the inverse weighting later.</p>
-<pre class="r"><code># Crease centroids
-coords &lt;- st_geometry(st_centroid(msoa.spdf))</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crease centroids</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>coords <span class="ot">&lt;-</span> <span class="fu">st_geometry</span>(<span class="fu">st_centroid</span>(msoa.spdf))</span></code></pre></div>
 <pre><code>## Warning in st_centroid.sf(msoa.spdf): st_centroid assumes attributes are
 ## constant over geometries of x</code></pre>
-<pre class="r"><code># Neighbours within 5km distance
-dist_3.nb &lt;- dnearneigh(coords, d1 = 0, d2 = 3000)
-summary(dist_3.nb)</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Neighbours within 5km distance</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dist_3.nb <span class="ot">&lt;-</span> <span class="fu">dnearneigh</span>(coords, <span class="at">d1 =</span> <span class="dv">0</span>, <span class="at">d2 =</span> <span class="dv">3000</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dist_3.nb)</span></code></pre></div>
 <pre><code>## Neighbour list object:
 ## Number of regions: 983 
 ## Number of nonzero links: 22086 
@@ -568,19 +633,19 @@ summary(dist_3.nb)</code></pre>
 ## 158 160 463 959 with 1 link
 ## 1 most connected region:
 ## 545 with 47 links</code></pre>
-<pre class="r"><code># Lets plot that
-plot(st_geometry(msoa.spdf), border = &quot;grey60&quot;)
-plot(dist_3.nb, coords, 
-     add = TRUE, pch = 19, cex = 0.6)</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lets plot that</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(msoa.spdf), <span class="at">border =</span> <span class="st">&quot;grey60&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dist_3.nb, coords, </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="fl">0.6</span>)</span></code></pre></div>
 <p><img src="SICSS-spatial_part2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 </div>
-<div id="normalization-of-boldsymbolmathbfw" class="section level3">
-<h3>Normalization of <span class="math inline">\({\boldsymbol{\mathbf{W}}}\)</span></h3>
+<div id="normalization-of-boldsymbolmathbfw" class="section level2">
+<h2>Normalization of <span class="math inline">\({\boldsymbol{\mathbf{W}}}\)</span></h2>
 <p>Normalizing ensures that the parameter space of the spatial multiplier is restricted to <span class="math inline">\(-1 &lt; \rho &gt; 1\)</span>, and the multiplier matrix is non-singular. Again, how to normalize a weights matrix is subject of debate <span class="citation">(<a href="#ref-LeSage.2014.0b" role="doc-biblioref">LeSage and Pace 2014</a>; <a href="#ref-Neumayer.2016.0" role="doc-biblioref">Neumayer and Plümper 2016</a>)</span>.</p>
 <p>Normalizing your weights matrix is always a good idea. Otherwise, the spatial parameters might blow up – if you can estimate the model at all.</p>
-<div id="row-normalization" class="section level4">
-<h4>Row-normalization</h4>
+<div id="row-normalization" class="section level3">
+<h3>Row-normalization</h3>
 <p>Row-normalization divides each non-zero weight by the sum of all weights of unit <span class="math inline">\(i\)</span>, which is the sum of the row.</p>
 <p><span class="math display">\[
 \frac{w_{ij}}{\sum_j^n w_{ij}}
@@ -591,9 +656,9 @@ plot(dist_3.nb, coords,
 <li><p>Can induce asymmetries: <span class="math inline">\(w_{ij} \neq w_{ji}\)</span></p></li>
 </ul>
 <p>For instance, we can use row-normalization for the Queens neighbours created above, and create a neighbours list with spatial weights</p>
-<pre class="r"><code>queens.lw &lt;- nb2listw(queens.nb,
-                      style = &quot;W&quot;) # W ist row-normalization
-summary(queens.lw)</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>queens.lw <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(queens.nb,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">style =</span> <span class="st">&quot;W&quot;</span>) <span class="co"># W ist row-normalization</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(queens.lw)</span></code></pre></div>
 <pre><code>## Characteristics of weights list object:
 ## Neighbour list object:
 ## Number of regions: 983 
@@ -614,8 +679,8 @@ summary(queens.lw)</code></pre>
 ##     n     nn  S0       S1      S2
 ## W 983 966289 983 356.6902 4018.36</code></pre>
 </div>
-<div id="maximum-eigenvalues-normalization" class="section level4">
-<h4>Maximum eigenvalues normalization</h4>
+<div id="maximum-eigenvalues-normalization" class="section level3">
+<h3>Maximum eigenvalues normalization</h3>
 <p>Maximum eigenvalues normalization: Divide each non-zero weight by overall maximum eigenvalue <span class="math inline">\(\lambda_{max}\)</span>. Each element of <span class="math inline">\(\boldsymbol{\mathbf{W}}\)</span> is divided by the same scalar parameter.</p>
 <p><span class="math display">\[
 \frac{\boldsymbol{\mathbf{W}}}{\lambda_{max}}
@@ -625,12 +690,12 @@ summary(queens.lw)</code></pre>
 <li><p>Keeps proportions of connectivity strengths across units (relevant esp. for distance based <span class="math inline">\(\boldsymbol{\mathbf{W}}\)</span>)</p></li>
 </ul>
 <p>For instance, we can use eigenvalue normalization for the inverse distance neighbours. We use <code>nb2listwdist()</code> to create weight by inverse distance and normalize in one step.</p>
-<pre class="r"><code>idw.lw &lt;- nb2listwdist(dist_3.nb,
-                       x = coords, # needed for idw
-                       type = &quot;idw&quot;, # inverse distance weighting
-                       alpha = 1, # the decay parameter for distance weighting
-                       style = &quot;minmax&quot;) # for eigenvalue normalization
-summary(idw.lw)</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>idw.lw <span class="ot">&lt;-</span> <span class="fu">nb2listwdist</span>(dist_3.nb,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">x =</span> coords, <span class="co"># needed for idw</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">type =</span> <span class="st">&quot;idw&quot;</span>, <span class="co"># inverse distance weighting</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">alpha =</span> <span class="dv">1</span>, <span class="co"># the decay parameter for distance weighting</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">style =</span> <span class="st">&quot;minmax&quot;</span>) <span class="co"># for eigenvalue normalization</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(idw.lw)</span></code></pre></div>
 <pre><code>## Characteristics of weights list object:
 ## Neighbour list object:
 ## Number of regions: 983 
@@ -654,8 +719,9 @@ summary(idw.lw)</code></pre>
 ## minmax 983 966289 463.6269 23.92505 1117.636</code></pre>
 </div>
 </div>
-<div id="spatial-autocorrelation" class="section level3">
-<h3>Spatial Autocorrelation</h3>
+</div>
+<div id="spatial-autocorrelation" class="section level1">
+<h1>Spatial Autocorrelation</h1>
 <p>If spatially close observations are more likely to exhibit similar values, we cannot handle observations as if they were independent.</p>
 <p><span class="math display">\[ 
 \mathrm{E}(\varepsilon_i\varepsilon_j)\neq \mathrm{E}(\varepsilon_i)\mathrm{E}(\varepsilon_j) = 0
@@ -665,31 +731,31 @@ summary(idw.lw)</code></pre>
 <li><p>biased inferential statistics</p></li>
 <li><p>biased point estimates (depending on the DGP)</p></li>
 </ul>
-<div id="detection-visualization" class="section level4">
-<h4>Detection: Visualization</h4>
+<div id="visualization" class="section level3">
+<h3>Visualization</h3>
 <p>There is one very easy and intuitive way of detecting spatial autocorrelation: Just look at the map. We do so by using <code>tmap</code> for plotting the housing values.</p>
-<pre class="r"><code>mp1 &lt;- tm_shape(msoa.spdf) +
-  tm_fill(col = &quot;Value&quot;, 
-          #style = &quot;cont&quot;,
-          style = &quot;fisher&quot;, n = 8,
-          title = &quot;Median&quot;, 
-          palette = viridis(n = 8, direction = -1, option = &quot;C&quot;),
-          legend.hist = TRUE) +
-  tm_borders(col = &quot;black&quot;, lwd = 1) +
-  tm_layout(legend.frame = TRUE, legend.bg.color = TRUE,
-            #legend.position = c(&quot;right&quot;, &quot;bottom&quot;),
-            legend.outside = TRUE,
-            main.title = &quot;Housing values 2017&quot;, 
-            main.title.position = &quot;center&quot;,
-            title.snap.to.legend = TRUE) 
-
-mp1 </code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mp1 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(msoa.spdf) <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">&quot;Value&quot;</span>, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>          <span class="co">#style = &quot;cont&quot;,</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">&quot;fisher&quot;</span>, <span class="at">n =</span> <span class="dv">8</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">&quot;Median&quot;</span>, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="fu">viridis</span>(<span class="at">n =</span> <span class="dv">8</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">option =</span> <span class="st">&quot;C&quot;</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">legend.hist =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">legend.frame =</span> <span class="cn">TRUE</span>, <span class="at">legend.bg.color =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>            <span class="co">#legend.position = c(&quot;right&quot;, &quot;bottom&quot;),</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.outside =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title =</span> <span class="st">&quot;Housing values 2017&quot;</span>, </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">&quot;center&quot;</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.snap.to.legend =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>mp1 </span></code></pre></div>
 <p><img src="SICSS-spatial_part2_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre><code>## [1] &quot;#F0F921&quot; &quot;#FEBC2A&quot; &quot;#F48849&quot; &quot;#DB5C68&quot; &quot;#B93289&quot; &quot;#8B0AA5&quot; &quot;#5402A3&quot;
 ## [8] &quot;#0D0887&quot;</code></pre>
 </div>
-<div id="detection-morans-i" class="section level4">
-<h4>Detection: Moran’s I</h4>
+<div id="morans-i" class="section level3">
+<h3>Moran’s I</h3>
 <p>Global Moran’s I test statistic: <span class="math display">\[      
         \begin{equation} 
         \boldsymbol{\mathbf{I}}  = \frac{N}{S_0}  
@@ -703,8 +769,8 @@ mp1 </code></pre>
 <li><p>Around zero: no autocorrelation</p></li>
 <li><p>Positive values: positive autocorrelation</p></li>
 </ul>
-<pre class="r"><code># Global Morans I test of housing values based on contiguity weights
-moran.test(msoa.spdf$Value, listw = queens.lw, alternative = &quot;two.sided&quot;)</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Global Morans I test of housing values based on contiguity weights</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">moran.test</span>(msoa.spdf<span class="sc">$</span>Value, <span class="at">listw =</span> queens.lw, <span class="at">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Moran I test under randomisation
 ## 
@@ -716,8 +782,8 @@ moran.test(msoa.spdf$Value, listw = queens.lw, alternative = &quot;two.sided&quo
 ## sample estimates:
 ## Moran I statistic       Expectation          Variance 
 ##      0.7068094990     -0.0010183299      0.0003613048</code></pre>
-<pre class="r"><code># Global Morans I test of housing values based on idw
-moran.test(msoa.spdf$Value, listw = idw.lw, alternative = &quot;two.sided&quot;)</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Global Morans I test of housing values based on idw</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">moran.test</span>(msoa.spdf<span class="sc">$</span>Value, <span class="at">listw =</span> idw.lw, <span class="at">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Moran I test under randomisation
 ## 
@@ -731,12 +797,12 @@ moran.test(msoa.spdf$Value, listw = idw.lw, alternative = &quot;two.sided&quot;)
 ##      0.7260392810     -0.0010183299      0.0001064319</code></pre>
 </div>
 </div>
-<div id="spatial-regression-models" class="section level3">
-<h3>Spatial Regression Models</h3>
+<div id="spatial-regression-models" class="section level1">
+<h1>Spatial Regression Models</h1>
 <p>There are a bunch of different techniques to model spatial dependence and spatial processes <span class="citation">(<a href="#ref-LeSage.2009.0" role="doc-biblioref">LeSage and Pace 2009</a>)</span>. Here, we will just cover a few of the most common techniques / econometric models. One advantage of the most basic spatial model (SLX) is that this method can easily be incorporated in a variety of other methodologies, such as machine learning approaches. <span class="citation"><a href="#ref-HalleckVega.2015.0" role="doc-biblioref">Halleck Vega and Elhorst</a> (<a href="#ref-HalleckVega.2015.0" role="doc-biblioref">2015</a>)</span>, LeSage.2014.0, and <span class="citation"><a href="#ref-Ruttenauer.2019c" role="doc-biblioref">Rüttenauer</a> (<a href="#ref-Ruttenauer.2019c" role="doc-biblioref">2019</a>)</span> provide article-length introductions.</p>
 <p>There are three basic ways of incorporating spatial dependece.</p>
-<div id="spatial-error-model-sem" class="section level5">
-<h5>Spatial Error Model (SEM)</h5>
+<div id="spatial-error-model-sem" class="section level3">
+<h3>Spatial Error Model (SEM)</h3>
 <ul>
 <li>Clustering on Unobservables</li>
 </ul>
@@ -749,8 +815,8 @@ moran.test(msoa.spdf$Value, listw = idw.lw, alternative = &quot;two.sided&quot;)
         \end{equation}
 \]</span></p>
 </div>
-<div id="spatial-autoregressive-model-sar" class="section level5">
-<h5>Spatial Autoregressive Model (SAR)</h5>
+<div id="spatial-autoregressive-model-sar" class="section level3">
+<h3>Spatial Autoregressive Model (SAR)</h3>
 <ul>
 <li>Interdependence</li>
 </ul>
@@ -760,8 +826,8 @@ moran.test(msoa.spdf$Value, listw = idw.lw, alternative = &quot;two.sided&quot;)
         \end{equation}  
 \]</span></p>
 </div>
-<div id="spatially-lagged-x-model-slx" class="section level5">
-<h5>Spatially lagged X Model (SLX)</h5>
+<div id="spatially-lagged-x-model-slx" class="section level3">
+<h3>Spatially lagged X Model (SLX)</h3>
 <ul>
 <li>Clustering on Spillovers in Covariates</li>
 </ul>
@@ -772,16 +838,16 @@ moran.test(msoa.spdf$Value, listw = idw.lw, alternative = &quot;two.sided&quot;)
 \]</span><br />
 Moreover, there are models combining two sets of the above specifications.</p>
 </div>
-<div id="spatial-durbin-model-sdm" class="section level5">
-<h5>Spatial Durbin Model (SDM)</h5>
+<div id="spatial-durbin-model-sdm" class="section level3">
+<h3>Spatial Durbin Model (SDM)</h3>
 <p><span class="math display">\[
         \begin{equation}
         {\boldsymbol{\mathbf{y}}}=\alpha{\boldsymbol{\mathbf{\iota}}}+{\boldsymbol{\mathbf{X}}}{\boldsymbol{\mathbf{\beta}}}+{\boldsymbol{\mathbf{W}}}{\boldsymbol{\mathbf{X}}}{\boldsymbol{\mathbf{\theta}}}+ {\boldsymbol{\mathbf{\varepsilon}}}
         \end{equation}
 \]</span></p>
 </div>
-<div id="spatial-durbin-error-model-sdem" class="section level5">
-<h5>Spatial Durbin Error Model (SDEM)</h5>
+<div id="spatial-durbin-error-model-sdem" class="section level3">
+<h3>Spatial Durbin Error Model (SDEM)</h3>
 <p><span class="math display">\[
     \begin{equation}
         \begin{split}
@@ -791,8 +857,8 @@ Moreover, there are models combining two sets of the above specifications.</p>
         \end{equation}
 \]</span></p>
 </div>
-<div id="combined-spatial-autocorrelation-model-sac" class="section level5">
-<h5>Combined Spatial Autocorrelation Model (SAC)</h5>
+<div id="combined-spatial-autocorrelation-model-sac" class="section level3">
+<h3>Combined Spatial Autocorrelation Model (SAC)</h3>
 <p><span class="math display">\[
         \begin{equation}
         \begin{split}
@@ -805,17 +871,17 @@ Moreover, there are models combining two sets of the above specifications.</p>
 <p>Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies <span class="citation">(<a href="#ref-HalleckVega.2015.0" role="doc-biblioref">Halleck Vega and Elhorst 2015</a>; <a href="#ref-Ruttenauer.2019c" role="doc-biblioref">Rüttenauer 2019</a>; <a href="#ref-Wimpy.2021" role="doc-biblioref">Wimpy, Whitten, and Williams 2021</a>)</span> highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.</p>
 </div>
 </div>
-<div id="spatial-regression-models-example" class="section level3">
-<h3>Spatial Regression Models: Example</h3>
+<div id="spatial-regression-models-example" class="section level1">
+<h1>Spatial Regression Models: Example</h1>
 <p>To estimate spatial models, we can currently use <code>spdep</code> or <code>spatialreg</code>. They contain the same functions, but spatial regression models will be made defunct in <code>spdep</code> in future releases, and will only be available in <code>spatialreg</code>.</p>
-<div id="sar" class="section level4">
-<h4>SAR</h4>
+<div id="sar" class="section level3">
+<h3>SAR</h3>
 <p>Lets estimate a spatial SAR model using the <code>lagsarlm()</code> with contiguity weights. Here we use the median housing values as depended variable. We include population density (<code>POPDEN</code>), the percentage of tree cover (<code>canopy_per</code>), and the number of pubs (<code>pubs_count</code>)</p>
-<pre class="r"><code>hv_1.sar &lt;- lagsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
-                     data = msoa.spdf, 
-                     listw = queens.lw,
-                     Durbin = FALSE) # we could here extend to SDM
-summary(hv_1.sar)</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>hv_1.sar <span class="ot">&lt;-</span> <span class="fu">lagsarlm</span>(<span class="fu">log</span>(Value) <span class="sc">~</span> <span class="fu">log</span>(POPDEN) <span class="sc">+</span> canopy_per <span class="sc">+</span> pubs_count,  </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> msoa.spdf, </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">listw =</span> queens.lw,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">Durbin =</span> <span class="cn">FALSE</span>) <span class="co"># we could here extend to SDM</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hv_1.sar)</span></code></pre></div>
 <pre><code>## 
 ## Call:lagsarlm(formula = log(Value) ~ log(POPDEN) + canopy_per + pubs_count, 
 ##     data = msoa.spdf, listw = queens.lw, Durbin = FALSE)
@@ -847,14 +913,14 @@ summary(hv_1.sar)</code></pre>
 <p>This looks pretty much like a conventional model output, with some additional information: a highly significant <code>hv_1.sar$rho</code> of 0.81 indicates strong positive spatial autocorrelation. In substantive terms, housing prices in the focal unit positively influence housing prices in neighbouring units, which again influences housing prices among the neighbours of these neighbours, and so on.</p>
 <p><strong>NOTE</strong>: interpreting the coefficients or covariates in a SAR model seldomly makes sense, because of the spillovers and feedback loops in <span class="math inline">\(\boldsymbol{\mathbf{y}}\)</span> mentioned above!</p>
 </div>
-<div id="sem" class="section level4">
-<h4>SEM</h4>
+<div id="sem" class="section level3">
+<h3>SEM</h3>
 <p>SEM models can be estimated using <code>errorsarlm()</code>.</p>
-<pre class="r"><code>hv_1.sem &lt;- errorsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
-                     data = msoa.spdf, 
-                     listw = queens.lw,
-                     Durbin = FALSE) # we could here extend to SDM
-summary(hv_1.sem)</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>hv_1.sem <span class="ot">&lt;-</span> <span class="fu">errorsarlm</span>(<span class="fu">log</span>(Value) <span class="sc">~</span> <span class="fu">log</span>(POPDEN) <span class="sc">+</span> canopy_per <span class="sc">+</span> pubs_count,  </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> msoa.spdf, </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">listw =</span> queens.lw,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">Durbin =</span> <span class="cn">FALSE</span>) <span class="co"># we could here extend to SDM</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hv_1.sem)</span></code></pre></div>
 <pre><code>## 
 ## Call:errorsarlm(formula = log(Value) ~ log(POPDEN) + canopy_per + 
 ##     pubs_count, data = msoa.spdf, listw = queens.lw, Durbin = FALSE)
@@ -883,14 +949,14 @@ summary(hv_1.sem)</code></pre>
 ## AIC: -177.59, (AIC for lm: 658.33)</code></pre>
 <p>In this case <code>hv_1.sem$lambda</code> gives us the spatial parameter. In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model.</p>
 </div>
-<div id="slx" class="section level4">
-<h4>SLX</h4>
+<div id="slx" class="section level3">
+<h3>SLX</h3>
 <p>Above, we could have estimated SDM and SDEM models using the <code>Durbin</code> option. To estimate SLX models, we can either use <code>lmSLX()</code> directly, or we can create <span class="math inline">\(\boldsymbol{\mathbf{W}} \boldsymbol{\mathbf{X}}\)</span> manually and use that in any available model fitting function.</p>
-<pre class="r"><code>hv_1.slx &lt;- lmSLX(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
-                  data = msoa.spdf, 
-                  listw = queens.lw, 
-                  Durbin = TRUE) # use a formula to lag only specific covariates
-summary(hv_1.slx)</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>hv_1.slx <span class="ot">&lt;-</span> <span class="fu">lmSLX</span>(<span class="fu">log</span>(Value) <span class="sc">~</span> <span class="fu">log</span>(POPDEN) <span class="sc">+</span> canopy_per <span class="sc">+</span> pubs_count,  </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> msoa.spdf, </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">listw =</span> queens.lw, </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">Durbin =</span> <span class="cn">TRUE</span>) <span class="co"># use a formula to lag only specific covariates</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hv_1.slx)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = formula(paste(&quot;y ~ &quot;, paste(colnames(x)[-1], collapse = &quot;+&quot;))), 
@@ -917,20 +983,20 @@ summary(hv_1.slx)</code></pre>
 ## F-statistic:  67.2 on 6 and 976 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>In SLX models, we receive the direct effects of covariates as well as the effects of the spatially lagged variables. Here, we can interpret the coefficients directly. For instance, lets look at population density: 1) a high population density in the focal unit is related to lower housing prices, but 2) a high population density in the neighbouring areas in related to higher housing prices (while keeping population density in the focal unit constant). This might indicate that areas with a low population density in central regions of the city (high pop density around) have higher housing prices. We could try testing this interpretation by including the distance to the city centre as a control.</p>
 <p>Another way of estimating the same model is lagging the covariates first.</p>
-<pre class="r"><code># Loop through vars and create lagged variables
-msoa.spdf$log_POPDEN &lt;- log(msoa.spdf$POPDEN)
-vars &lt;- c(&quot;Value&quot;, &quot;log_POPDEN&quot;, &quot;canopy_per&quot;, &quot;pubs_count&quot;)
-for(v in vars){
-  msoa.spdf[, paste0(&quot;w.&quot;, v)] &lt;- lag.listw(queens.lw,
-                                            var = st_drop_geometry(msoa.spdf)[, v])
-}
-
-# Alternatively:
-w_vars &lt;- create_WX(st_drop_geometry(msoa.spdf[, vars]),
-                    listw = queens.lw,
-                    prefix=&quot;w&quot;)
-
-head(w_vars)</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through vars and create lagged variables</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>msoa.spdf<span class="sc">$</span>log_POPDEN <span class="ot">&lt;-</span> <span class="fu">log</span>(msoa.spdf<span class="sc">$</span>POPDEN)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Value&quot;</span>, <span class="st">&quot;log_POPDEN&quot;</span>, <span class="st">&quot;canopy_per&quot;</span>, <span class="st">&quot;pubs_count&quot;</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(v <span class="cf">in</span> vars){</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  msoa.spdf[, <span class="fu">paste0</span>(<span class="st">&quot;w.&quot;</span>, v)] <span class="ot">&lt;-</span> <span class="fu">lag.listw</span>(queens.lw,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">var =</span> <span class="fu">st_drop_geometry</span>(msoa.spdf)[, v])</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternatively:</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>w_vars <span class="ot">&lt;-</span> <span class="fu">create_WX</span>(<span class="fu">st_drop_geometry</span>(msoa.spdf[, vars]),</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">listw =</span> queens.lw,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">prefix=</span><span class="st">&quot;w&quot;</span>)</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(w_vars)</span></code></pre></div>
 <pre><code>##       w.Value w.log_POPDEN w.canopy_per w.pubs_count
 ## [1,] 843550.0     4.662014     9.201539    37.000000
 ## [2,] 353666.7     3.300901    19.324093     1.333333
@@ -939,10 +1005,10 @@ head(w_vars)</code></pre>
 ## [5,] 316650.0     3.993660    17.011171     1.000000
 ## [6,] 317375.0     3.876070    23.598908     1.000000</code></pre>
 <p>And subsequently we use those new variable in a linear model.</p>
-<pre class="r"><code>hv_1.lm &lt;- lm (log(Value) ~ log(POPDEN) + canopy_per + pubs_count +
-                 w.log_POPDEN + w.canopy_per + w.pubs_count,
-               data = msoa.spdf)
-summary(hv_1.lm)</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>hv_1.lm <span class="ot">&lt;-</span> <span class="fu">lm</span> (<span class="fu">log</span>(Value) <span class="sc">~</span> <span class="fu">log</span>(POPDEN) <span class="sc">+</span> canopy_per <span class="sc">+</span> pubs_count <span class="sc">+</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                 w.log_POPDEN <span class="sc">+</span> w.canopy_per <span class="sc">+</span> w.pubs_count,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> msoa.spdf)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hv_1.lm)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = log(Value) ~ log(POPDEN) + canopy_per + pubs_count + 
@@ -976,10 +1042,10 @@ summary(hv_1.lm)</code></pre>
 </ul>
 </div>
 </div>
-<div id="impacts" class="section level3">
-<h3>Impacts</h3>
-<div id="coefficient-estimates-neq-marginal-effects" class="section level4">
-<h4>Coefficient estimates <span class="math inline">\(\neq\)</span> `marginal’ effects</h4>
+<div id="impacts" class="section level1">
+<h1>Impacts</h1>
+<div id="coefficient-estimates-neq-marginal-effects" class="section level3">
+<h3>Coefficient estimates <span class="math inline">\(\neq\)</span> `marginal’ effects</h3>
 <p><strong>Attention</strong>: Do not interpret coefficients in SAR, SAC, and SDM!! Using the reduced form</p>
 <p><span class="math display">\[  
     \begin{equation}
@@ -1000,8 +1066,8 @@ summary(hv_1.lm)</code></pre>
 \]</span><br />
 where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> equals the effect stemming from direct neighbours, <span class="math inline">\(\rho^2{\boldsymbol{\mathbf{W}}}^2\beta_k\)</span> the effect stemming from second order neighbours (neighbours of neighbours),… This also includes feedback loops if unit <span class="math inline">\(i\)</span> is also a second order neighbour of itself.</p>
 </div>
-<div id="impacts-1" class="section level4">
-<h4>Impacts</h4>
+<div id="impacts-1" class="section level3">
+<h3>Impacts</h3>
 <p>Note that the derivatives consist of a matrix, returning individual effects for each unit on each other unit, differentialet in <em>direct, indirect, and total impacts</em>. However, these individual effects mainly vary because of variation in <span class="math inline">\({\boldsymbol{\mathbf{W}}}\)</span>. Usually, one should use summary measures to report effects in spatial models <span class="citation">(<a href="#ref-LeSage.2009.0" role="doc-biblioref">LeSage and Pace 2009</a>)</span>. <span class="citation"><a href="#ref-HalleckVega.2015.0" role="doc-biblioref">Halleck Vega and Elhorst</a> (<a href="#ref-HalleckVega.2015.0" role="doc-biblioref">2015</a>)</span> provide a nice summary of the impacts for each model:</p>
 <table>
 <colgroup>
@@ -1045,8 +1111,8 @@ where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> 
 <li><p>Local spillover effects: SLX, SDEM</p></li>
 </ul>
 <p>We can calculate these impacts using <code>impacts()</code> with simulated distributions, e.g. for the SAR model:</p>
-<pre class="r"><code>hv_1.sar.imp &lt;- impacts(hv_1.sar, listw = queens.lw, R = 300)
-summary(hv_1.sar.imp, zstats = TRUE, short = TRUE)</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>hv_1.sar.imp <span class="ot">&lt;-</span> <span class="fu">impacts</span>(hv_1.sar, <span class="at">listw =</span> queens.lw, <span class="at">R =</span> <span class="dv">300</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hv_1.sar.imp, <span class="at">zstats =</span> <span class="cn">TRUE</span>, <span class="at">short =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## Impact measures (lag, exact):
 ##                   Direct    Indirect       Total
 ## log(POPDEN) -0.008216925 -0.02724569 -0.03546261
@@ -1057,26 +1123,26 @@ summary(hv_1.sar.imp, zstats = TRUE, short = TRUE)</code></pre>
 ## ========================================================
 ## Simulated standard errors
 ##                   Direct    Indirect       Total
-## log(POPDEN) 0.0133116737 0.046286771 0.059516113
-## canopy_per  0.0013067735 0.004500021 0.005675619
-## pubs_count  0.0008021718 0.003331039 0.004029913
+## log(POPDEN) 0.0126477307 0.042968385 0.055523784
+## canopy_per  0.0012636686 0.004400333 0.005540352
+## pubs_count  0.0008223679 0.003235097 0.003959136
 ## 
 ## Simulated z-values:
 ##                 Direct   Indirect      Total
-## log(POPDEN) -0.5104614 -0.4995427 -0.5026759
-## canopy_per   4.1932706  4.0865128  4.2055413
-## pubs_count   5.3402741  4.3464561  4.6556926
+## log(POPDEN) -0.8266239 -0.8134232 -0.8177828
+## canopy_per   4.2012623  4.0173707  4.1489733
+## pubs_count   5.1594364  4.3878403  4.6570887
 ## 
 ## Simulated p-values:
 ##             Direct     Indirect   Total     
-## log(POPDEN) 0.60973    0.6174     0.61519   
-## canopy_per  2.7496e-05 4.3791e-05 2.6046e-05
-## pubs_count  9.2806e-08 1.3835e-05 3.2289e-06</code></pre>
-<pre class="r"><code># Alternative with traces (better for large W)
-W &lt;- as(queens.lw, &quot;CsparseMatrix&quot;)
-trMatc &lt;- trW(W, type=&quot;mult&quot;)
-hv_1.sar.imp2 &lt;- impacts(hv_1.sar, tr = trMatc, R = 300, Q = 10)
-summary(hv_1.sar.imp2, zstats = TRUE, short = TRUE)</code></pre>
+## log(POPDEN) 0.40845    0.41598    0.41348   
+## canopy_per  2.6543e-05 5.8851e-05 3.3397e-05
+## pubs_count  2.4769e-07 1.1448e-05 3.2071e-06</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative with traces (better for large W)</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">as</span>(queens.lw, <span class="st">&quot;CsparseMatrix&quot;</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>trMatc <span class="ot">&lt;-</span> <span class="fu">trW</span>(W, <span class="at">type=</span><span class="st">&quot;mult&quot;</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>hv_1.sar.imp2 <span class="ot">&lt;-</span> <span class="fu">impacts</span>(hv_1.sar, <span class="at">tr =</span> trMatc, <span class="at">R =</span> <span class="dv">300</span>, <span class="at">Q =</span> <span class="dv">10</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hv_1.sar.imp2, <span class="at">zstats =</span> <span class="cn">TRUE</span>, <span class="at">short =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## Impact measures (lag, trace):
 ##                   Direct    Indirect       Total
 ## log(POPDEN) -0.008216080 -0.02717024 -0.03538632
@@ -1087,24 +1153,24 @@ summary(hv_1.sar.imp2, zstats = TRUE, short = TRUE)</code></pre>
 ## ========================================================
 ## Simulated standard errors
 ##                   Direct    Indirect       Total
-## log(POPDEN) 0.0132921855 0.046014632 0.059215583
-## canopy_per  0.0011358850 0.004281024 0.005295750
-## pubs_count  0.0008360857 0.003164799 0.003892459
+## log(POPDEN) 0.0128048634 0.043726528 0.056413547
+## canopy_per  0.0012869356 0.004654952 0.005817995
+## pubs_count  0.0008224339 0.003063279 0.003776507
 ## 
 ## Simulated z-values:
 ##                 Direct   Indirect      Total
-## log(POPDEN) -0.6186894 -0.6033781 -0.6077446
-## canopy_per   4.8220746  4.3060442  4.5152434
-## pubs_count   5.1119758  4.5422384  4.7911422
+## log(POPDEN) -0.6611756 -0.6580676 -0.6601477
+## canopy_per   4.1835339  3.8666443  4.0190790
+## pubs_count   5.1486120  4.6222256  4.8705222
 ## 
 ## Simulated p-values:
-##             Direct     Indirect  Total     
-## log(POPDEN) 0.53612    0.54626   0.54336   
-## canopy_per  1.4207e-06 1.662e-05 6.3244e-06
-## pubs_count  3.1881e-07 5.566e-06 1.6583e-06</code></pre>
+##             Direct     Indirect   Total     
+## log(POPDEN) 0.5085     0.51049469 0.50916   
+## canopy_per  2.8701e-05 0.00011034 5.8426e-05
+## pubs_count  2.6242e-07 3.7964e-06 1.1130e-06</code></pre>
 <p>The indirect effects here refer to global spillover effects. This means a change of <span class="math inline">\(x\)</span> in the focal units flows through the entire system of neighbours (direct nieightbours, neighbours of neighbours, …) influencing <span class="math inline">\(y\)</span>. One can think of this as diffusion in time or a change in long-term equilibrium.</p>
 <p>For SLX models, nothing is gained from computing the impacts</p>
-<pre class="r"><code>print(impacts(hv_1.slx, listw = queens.lw))</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">impacts</span>(hv_1.slx, <span class="at">listw =</span> queens.lw))</span></code></pre></div>
 <pre><code>## Impact measures (SlX, estimable):
 ##                   Direct   Indirect      Total
 ## log(POPDEN) -0.060334591 0.28926384 0.22892925
@@ -1112,8 +1178,8 @@ summary(hv_1.sar.imp2, zstats = TRUE, short = TRUE)</code></pre>
 ## pubs_count   0.003552843 0.01590812 0.01946096</code></pre>
 </div>
 </div>
-<div id="references" class="section level3 unnumbered">
-<h3 class="unnumbered">References</h3>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bivand.2018.748" class="csl-entry">
 Bivand, Roger, Edzer Pebesma, and Virgilio Gómez-Rubio. 2008. <span>“<span>Creating Neighbours</span>.”</span> <a href="https://r-spatial.github.io/spdep/articles/nb.html">https://r-spatial.github.io/spdep/articles/nb.html</a>.

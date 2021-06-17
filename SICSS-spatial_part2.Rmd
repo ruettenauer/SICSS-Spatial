@@ -4,6 +4,8 @@ author: "Tobias Rüttenauer"
 date: "June 19, 2021"
 output: 
   html_document:
+    theme: flatly
+    highlight: haddock
     toc: true
     toc_float:
       collapsed: false
@@ -45,13 +47,13 @@ load("msoa_spatial.RData")
 
 ```
 
-### Spatial interdependence
+# Spatial interdependence
 
 We can not only use coordinates and geo-spatial information to connect different data sources, we can also explicitly model spatial (inter)depence in the analysis of our data. In many instance, accounting for spatial dependence might even be necessary to avoid biased point estimates and standard errors. The reason is our observations are often not independent and identically distributed: 'everything is related to everything else, but near things are more related than distant things' [@Tobler.1970.0].
 
 However, even if we would receive unbiased estimates with conventional methods, using the spatial information inherent in the data can help us detect specific patterns and spatial relations. 
 
-### ${\bm W}$: Connectivity between units
+## ${\bm W}$: Connectivity between units
 
 To analyse spatial relations, we first need to define some sort of connectivity between units (e.g. similar to network analysis). There is an ongoing debate about the importance of spatial weights for spatial econometrics and about the right way to specify weights matrices [@LeSage.2014.0b, @Neumayer.2016.0]. The following graph shows some possible options in how to define connectivity between units.
 
@@ -70,7 +72,7 @@ $$
 $$
 Note: The diagonal elements $w_{i,i}= w_{1,1}, w_{2,2}, \dots, w_{n,n}$  of $\bm W$	are always zero. No unit is a neighbour of itself.
 
-#### Contiguity weights
+### Contiguity weights
 
 A very common type of spatial weights. Binary specification, taking the value 1 for neighbouring units (queens: sharing a common edge; rook: sharing a common border), and 0 otherwise.
 
@@ -115,7 +117,7 @@ print(W[1:10, 1:10])
 ```
 
 
-#### Distance based weights
+### Distance based weights
 
 Another common type uses the distance $d_{ij}$ between each unit $i$ and $j$.
 
@@ -152,13 +154,13 @@ plot(dist_3.nb, coords,
 
 ```
 
-### Normalization of ${\bm W}$
+## Normalization of ${\bm W}$
 
 Normalizing ensures that the parameter space of the spatial multiplier is restricted to $-1 < \rho > 1$, and the multiplier matrix is non-singular. Again, how to normalize a weights matrix is subject of debate [@LeSage.2014.0b; @Neumayer.2016.0].
 	
 Normalizing your weights matrix is always a good idea. Otherwise, the spatial parameters might blow up -- if you can estimate the model at all.
 
-#### Row-normalization
+### Row-normalization
 
 Row-normalization divides each non-zero weight by the sum of all weights of unit $i$, which is the sum of the row. 
 
@@ -181,7 +183,7 @@ summary(queens.lw)
 ```
 
 	
-#### Maximum eigenvalues normalization
+### Maximum eigenvalues normalization
 
 Maximum eigenvalues normalization: Divide each non-zero weight by overall maximum eigenvalue $\lambda_{max}$. Each element of $\bm W$ is divided by the same scalar parameter. 
 		 
@@ -205,7 +207,7 @@ summary(idw.lw)
 
 ```
 
-### Spatial Autocorrelation
+# Spatial Autocorrelation
 
 If spatially close observations are more likely to exhibit similar values, we cannot handle observations as if they were independent.
 
@@ -219,7 +221,7 @@ This violates a basic assumption of the conventional OLS model. In consequence, 
 
 * biased point estimates (depending on the DGP)
 
-#### Detection: Visualization
+### Visualization
 
 There is one very easy and intuitive way of detecting spatial autocorrelation: Just look at the map. We do so by using `tmap` for plotting the housing values.
 
@@ -243,7 +245,7 @@ mp1
 
 ```
 
-#### Detection: Moran's I
+### Moran's I
 
 Global Moran's I test statistic:
 $$		
@@ -271,13 +273,13 @@ moran.test(msoa.spdf$Value, listw = idw.lw, alternative = "two.sided")
 
 ```
 
-### Spatial Regression Models
+# Spatial Regression Models
 
 There are a bunch of different techniques to model spatial dependence and spatial processes [@LeSage.2009.0]. Here, we will just cover a few of the most common techniques / econometric models. One advantage of the most basic spatial model (SLX) is that this method can easily be incorporated in a variety of other methodologies, such as machine learning approaches. @HalleckVega.2015.0, LeSage.2014.0, and @Ruttenauer.2019c provide article-length introductions.
 
 There are three basic ways of incorporating spatial dependece.
 
-##### Spatial Error Model (SEM)
+### Spatial Error Model (SEM)
 
 * Clustering on Unobservables
 
@@ -290,7 +292,7 @@ $$
 		\end{equation}
 $$		
 
-##### Spatial Autoregressive Model (SAR)
+### Spatial Autoregressive Model (SAR)
 
 * Interdependence
 
@@ -300,7 +302,7 @@ $$
 		\end{equation}  
 $$	
 
-##### Spatially lagged X Model (SLX)
+### Spatially lagged X Model (SLX)
 
 * Clustering on Spillovers in Covariates
 
@@ -311,7 +313,7 @@ $$
 $$	
 Moreover, there are models combining two sets of the above specifications.
 
-##### Spatial Durbin Model (SDM)
+### Spatial Durbin Model (SDM)
 
 $$
 		\begin{equation}
@@ -319,7 +321,7 @@ $$
 		\end{equation}
 $$	
 
-##### Spatial Durbin Error Model (SDEM)
+### Spatial Durbin Error Model (SDEM)
 
 $$
     \begin{equation}
@@ -330,7 +332,7 @@ $$
 		\end{equation}
 $$
 
-##### Combined Spatial Autocorrelation Model (SAC)
+### Combined Spatial Autocorrelation Model (SAC)
 
 $$
 		\begin{equation}
@@ -345,11 +347,11 @@ Note that all of these models assume different data generating processes (DGP) l
 
 Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies [@HalleckVega.2015.0; @Ruttenauer.2019c; @Wimpy.2021] highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.
 
-### Spatial Regression Models: Example
+# Spatial Regression Models: Example
 
 To estimate spatial models, we can currently use `spdep` or `spatialreg`. They contain the same functions, but spatial regression models will be made defunct in `spdep` in future releases, and will only be available in `spatialreg`.
 
-#### SAR
+### SAR
 
 Lets estimate a spatial SAR model using the `lagsarlm()` with contiguity weights. Here we use the median housing values as depended variable. We include population density (`POPDEN`), the percentage of tree cover (`canopy_per`), and the number of pubs (`pubs_count`)
 
@@ -366,7 +368,7 @@ This looks pretty much like a conventional model output, with some additional in
 
 __NOTE__: interpreting the coefficients or covariates in a SAR model seldomly makes sense, because of the spillovers and feedback loops in $\bm y$ mentioned above!
 
-#### SEM
+### SEM
 
 SEM models can be estimated using `errorsarlm()`.
 
@@ -381,7 +383,7 @@ summary(hv_1.sem)
 
 In this case `hv_1.sem$lambda` gives us the spatial parameter. In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model. 
 
-#### SLX
+### SLX
 
 Above, we could have estimated SDM and SDEM models using the `Durbin` option. To estimate SLX models, we can either use `lmSLX()` directly, or we can create $\bm W \bm X$ manually and use that in any available model fitting function.
 
@@ -437,9 +439,9 @@ Moreover, using the lagged variables gives a high degree of freedom. For instanc
 * Use machine learning techniques to determine the best fitting weights specification
 
 
-### Impacts
+# Impacts
 
-#### Coefficient estimates $\neq$ `marginal' effects
+### Coefficient estimates $\neq$ `marginal' effects
 
 __Attention__: Do not interpret coefficients in SAR, SAC, and SDM!! Using the reduced form 
 
@@ -465,9 +467,9 @@ $$
 	where $\rho{\bm W}\beta_k$ equals the effect stemming from direct neighbours, $\rho^2{\bm W}^2\beta_k$ the effect stemming from second order neighbours (neighbours of neighbours),... This also includes feedback loops if unit $i$ is also a second order neighbour of itself.
 
 
-#### Impacts
+### Impacts
 
-Note that the derivatives consist of a matrix, returning individual effects for each unit on each other unit, differentialet in _direct, indirect, and total impacts_. However, these individual effects mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
+Note that the derivatives consist of a matrix, returning individual effects for each unit on each other unit, differentiated in _direct, indirect, and total impacts_. However, the individual effects (how $i$ influences $j$) mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
 
 
 Model | Direct Impacts | Indirect Impacts 
@@ -507,4 +509,4 @@ print(impacts(hv_1.slx, listw = queens.lw))
 ```
 
 
-### References
+# References

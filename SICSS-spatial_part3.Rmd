@@ -4,6 +4,8 @@ author: "Tobias Rüttenauer"
 date: "June 19, 2021"
 output: 
   html_document:
+    theme: flatly
+    highlight: haddock
     toc: true
     toc_float:
       collapsed: false
@@ -13,6 +15,8 @@ theme: united
 bibliography: sicss-spatial.bib
 link-citations: yes
 ---
+
+# Practical exercises
 
 See below three practical exercises. Please choose the one you are most interested in. In case you are quick, try the remaining exercises. 
 

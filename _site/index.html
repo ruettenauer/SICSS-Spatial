@@ -18,7 +18,7 @@
 <script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -35,8 +35,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -47,16 +45,6 @@
   ul.task-list{list-style: none;}
     </style>
 
-<style type="text/css">code{white-space: pre;}</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
 
 
 
@@ -378,8 +366,8 @@ div.tocify {
 </div>
 
 
-<div id="introduction" class="section level3">
-<h3>Introduction</h3>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>This course material is designed for the Summer Institute in Computational Social Science (SICSS) Oxford. The material provides a short introduction into the use of geographical information to connect and analyze different spatial data sources. This course provides a brief and dense introduction to the fundamentals of using geographical information in <em>R</em>. This field has developed very quickly over the past few years, and <em>R</em> now provides a rich set of packages for various spatial data operations. For a more in-depth introduction into spatial data analysis in <em>R</em>, have a look into the materials references below.</p>
 <p>Why is spatial data linkage and analysis part of SICSS? The amount of spatial (‘readymade’) data sources is steadily increasing. For instance, the UK open data portal provides many indactors on a spatially agrregated level: <a href="https://data.gov.uk/" class="uri">https://data.gov.uk/</a>. Moreover, geographical information is increasingly available for traditional (‘custommade’) data sources, such as survey data. Using geographic information allows us to:</p>
 <ul>
@@ -392,8 +380,8 @@ div.tocify {
 <p class="caption">Figure: Spatial data linkage, Source: <span class="citation"><a href="#ref-Junger.2019" role="doc-biblioref">Jünger</a> (<a href="#ref-Junger.2019" role="doc-biblioref">2019</a>)</span></p>
 </div>
 </div>
-<div id="some-useful-packages" class="section level3">
-<h3>Some useful packages</h3>
+<div id="some-useful-packages" class="section level1">
+<h1>Some useful packages</h1>
 <p>By now, <em>R</em> provides a lot of functionalities for GIS applications and spatial econometrics, and further extensions. So, there are lots of packages not listed here <span class="citation">(see e.g. <a href="#ref-Bivand.2021" role="doc-biblioref">R. Bivand, Millo, and Piras 2021</a>)</span>. The most important packages for fundamental spatial operations are:</p>
 <ul>
 <li><p>Spatial data workhorses: <a href="https://cran.r-project.org/web/packages/sf/index.html">sf</a> and <a href="https://cran.r-project.org/web/packages/stars/index.html">stars</a></p></li>
@@ -403,8 +391,8 @@ div.tocify {
 <li><p>Spatial regression models: <a href="https://cran.r-project.org/web/packages/spatialreg/index.html">spatialreg</a></p></li>
 </ul>
 </div>
-<div id="further-materials" class="section level3">
-<h3>Further materials</h3>
+<div id="further-materials" class="section level1">
+<h1>Further materials</h1>
 <p>Readings</p>
 <ul>
 <li><p>Great up-to-date introduction to spatial R: <span class="citation"><a href="#ref-Lovelace.2019" role="doc-biblioref">Lovelace, Nowosad, and Muenchow</a> (<a href="#ref-Lovelace.2019" role="doc-biblioref">2019</a>)</span>, <a href="https://geocompr.robinlovelace.net/">freely available online</a></p></li>
@@ -417,8 +405,8 @@ div.tocify {
 <li>For those looking for a more in-depth introduction, I highly recommend Roger Bivand’s course on Spatial Data Analysis: <a href="https://www.youtube.com/watch?v=KkIbg50Pa0I&amp;list=PLXUoTpMa_9s10NVk4dBQljNOaOXAOhcE0">Youtube recordings</a>, <a href="https://rsbivand.github.io/ECS530_h19/">Course Materials</a></li>
 </ul>
 </div>
-<div id="references" class="section level3 unnumbered">
-<h3 class="unnumbered">References</h3>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bivand.2013.0" class="csl-entry">
 Bivand, Roger S., Edzer Pebesma, and Virgilio Gómez-Rubio. 2013. <em><span class="nocase">Applied Spatial Data Analysis with R</span></em>. New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-7618-4">https://doi.org/10.1007/978-1-4614-7618-4</a>.
