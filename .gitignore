@@ -4,3 +4,4 @@
 *.RData
 *.Ruserdata
 _data/
+.Rproj.user

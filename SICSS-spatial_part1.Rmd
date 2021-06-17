@@ -19,12 +19,14 @@ link-citations: yes
 ```{r, message = FALSE, warning = FALSE, results = 'hide'}
 pkgs <- c("sf", "mapview", "nngeo", "rnaturalearth", "dplyr") 
 lapply(pkgs, require, character.only = TRUE)
+
 ```
 
 ### Session info
 
 ```{r}
 sessionInfo()
+
 ```
 
 ### Coordinates
@@ -50,7 +52,7 @@ However, we need to specify a reference point for latitudes and longitudes (in t
 
 #### Projected CRS
 
-However, different data providers use different CRS. For instance, spatial data in the UK usually uses 'OSGB 1936 / British National Grid' ([EPSG:27700](https://epsg.io/27700)). Here, coordinates are in meters, and projected onto a planar 2D space. Generally, every provider of spatial data should specify which reference system they use, as using the correct reference system and projection is important for plotting and transforming spatial data, as well as for measuring distances. If you do not know the correct CRS, try starting with some standards, like [EPSG:4326](https://epsg.io/4326) in case you have decimal degree like coordinates, or try searching for the source in CRS libraries, like https://epsg.io/. However, you must check if the projected coordinates match their real location, e.g. using `mpaview()`.
+However, different data providers use different CRS. For instance, spatial data in the UK usually uses 'OSGB 1936 / British National Grid' ([EPSG:27700](https://epsg.io/27700)). Here, coordinates are in meters, and projected onto a planar 2D space. Generally, every provider of spatial data should specify which reference system they use, as using the correct reference system and projection is important for plotting and transforming spatial data, as well as for measuring distances. If you do not know the correct CRS, try starting with a standards CRS like [EPSG:4326](https://epsg.io/4326) in case you have decimal degree like coordinates. If it looks like projected coordinates, try searching for the country or region in CRS libraries like https://epsg.io/. However, you must check if the projected coordinates match their real location, e.g. using `mpaview()`.
 
 ```{r}
 # Coordinate pairs of two locations
@@ -72,6 +74,7 @@ nuffield.spdf <- st_as_sf(nuffield.df,
 
 # Map
 mapview(nuffield.spdf, zcol = "name")
+
 ```
 
 #### Why do we need different reference systems?
@@ -120,12 +123,14 @@ msoa.spdf <- st_read(dsn = paste0(dn, "/statistical-gis-boundaries-london/ESRI")
                      layer = "MSOA_2011_London_gen_MHW" # Note: no file ending, as all of them are required
                      )
 head(msoa.spdf)
+
 ```
 
 This looks like a conventional `data.frame` but has the additional column `geometry` containing the coordinates of each observation. `st_geometry()` returns only the geographic object and `st_drop_geometry()` only the `data.frame` without the coordinates. We can plot the object using `mapview()`.
 
 ```{r}
 mapview(msoa.spdf[, "POPDEN"])  
+
 ```
 
 <!-- And we add income estimates (https://data.london.gov.uk/dataset/ons-model-based-income-estimates--msoa) -->
@@ -164,6 +169,7 @@ msoa.spdf <- merge(msoa.spdf, hp.df,
                    all.x = TRUE, all.y = FALSE)
 
 mapview(msoa.spdf[, "Value"])
+
 ```
 
 
@@ -183,6 +189,7 @@ trees.spdf <- st_read(dsn = paste0(dn, "/shp-hexagon-files"),
 unlink(tmpf)
 
 mapview(trees.spdf[, "canopy_per"])  
+
 ```
 
 #### Cultural venues in London (point data)
@@ -202,6 +209,7 @@ pubs.spdf <- st_read(dsn = tmpf, layer = "Pubs")
 unlink(tmpf)
 
 mapview(st_geometry(pubs.spdf)) 
+
 ```
 
 
@@ -322,10 +330,14 @@ msoa.spdf <- merge(msoa.spdf, buf_hex.int, by = "MSOA11CD", all.x = TRUE)
 
 ```
 
+Note: For buffer related methods it often makes sense to use a population weighted centroid instead of geographic centroid (see [here](https://geoportal.statistics.gov.uk/datasets/ons::middle-layer-super-output-areas-december-2011-population-weighted-centroids/about) for MSOA population weighted centroids). However, often this information is not available.
+
 ### Save spatial data
 
 ```{r}
+# Save
 save(msoa.spdf, file = "msoa_spatial.RData")
+
 ```
 
 

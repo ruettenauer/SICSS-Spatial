@@ -1,0 +1,39 @@
+---
+title: "Practical exercises"
+author: "Tobias Rüttenauer"
+date: "June 19, 2021"
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 2
+theme: united
+bibliography: sicss-spatial.bib
+link-citations: yes
+---
+
+See below three practical exercises. Please choose the one you are most interested in. In case you are quick, try the remaining exercises. 
+
+1. Add a control for the distance to Boris' home (10 Downing St, London SW1A 2AB, UK). 
+
+    * You could either find the coordinates manually or you use `tmaptools` function `geocode_OSM()` using OpenStreetMaps. There are also Google Maps APIs like `ggmap` or `mapsapi` but they require registration.
+
+2. Do results change if we use the 10 nearest neighbours for our weights instead of Queens neighbours?
+
+3. Can you think of a way of testing if higher order neighbours add additional information to our regression model? 
+
+    * The function `nblag()` is helpful.
+
+In case you are interested in geo-spatial data analysis, try the following. Note that this might be a bit more tricky and may require some time.
+
+4. Try adding the amount of particulate matter (PM10, e.g. 2017) from Defra: https://uk-air.defra.gov.uk/data/pcm-data. 
+
+    * Note the following important sentence: "The coordinate system is OSGB and the coordinates represent the centre of each 1x1km cell".
+
+    * `st_buffer`with the options `nQuadSegs  = 1, endCapStyle = 'SQUARE'` provides an easy way to get points into grids
+
+<!-- * Add additional information to the MSOA from the 2011 census, for instance. -->
+
+<!-- `nomisr`, see Vignette [here](https://cran.r-project.org/web/packages/nomisr/vignettes/introduction.html). -->

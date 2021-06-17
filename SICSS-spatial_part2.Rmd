@@ -24,14 +24,16 @@ link-citations: yes
 ### Required packages
 
 ```{r, message = FALSE, warning = FALSE, results = 'hide'}
-pkgs <- c("sf", "mapview", "spatialreg", "spdep", "tmap", "viridisLite")
+pkgs <- c("sf", "mapview", "spdep", "spatialreg", "tmap", "viridisLite") # note: load spdep first, then spatialreg
 lapply(pkgs, require, character.only = TRUE)
+
 ```
 
 ### Session info
 
 ```{r}
 sessionInfo()
+
 ```
 
 ### Load spatial data
@@ -40,6 +42,7 @@ See previous file.
 
 ```{r}
 load("msoa_spatial.RData")
+
 ```
 
 ### Spatial interdependence
@@ -97,7 +100,7 @@ Lets create a contiguity weights matrix (Queens neighbours) for the London MSOAs
 # Contiguity (Queens) neighbours weights
 queens.nb <- poly2nb(msoa.spdf, 
                      queen = TRUE, 
-                     snap = 10) # Snap specifies that we consider points in 10m distance 'as touching'
+                     snap = 1) # we consider points in 1m distance as 'touching'
 summary(queens.nb)
 
 # Lets plot that
@@ -108,6 +111,7 @@ plot(queens.nb, st_centroid(st_geometry(msoa.spdf)),
 # We can also transform this into the matrix
 W <- nb2mat(queens.nb, style = "B")
 print(W[1:10, 1:10])
+
 ```
 
 
@@ -198,6 +202,7 @@ idw.lw <- nb2listwdist(dist_3.nb,
                        alpha = 1, # the decay parameter for distance weighting
                        style = "minmax") # for eigenvalue normalization
 summary(idw.lw)
+
 ```
 
 ### Spatial Autocorrelation
@@ -235,6 +240,7 @@ mp1 <- tm_shape(msoa.spdf) +
             title.snap.to.legend = TRUE) 
 
 mp1 
+
 ```
 
 #### Detection: Moran's I
@@ -262,6 +268,7 @@ moran.test(msoa.spdf$Value, listw = queens.lw, alternative = "two.sided")
 
 # Global Morans I test of housing values based on idw
 moran.test(msoa.spdf$Value, listw = idw.lw, alternative = "two.sided")
+
 ```
 
 ### Spatial Regression Models
@@ -338,6 +345,98 @@ Note that all of these models assume different data generating processes (DGP) l
 
 Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies [@HalleckVega.2015.0; @Ruttenauer.2019c; @Wimpy.2021] highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.
 
+### Spatial Regression Models: Example
+
+To estimate spatial models, we can currently use `spdep` or `spatialreg`. They contain the same functions, but spatial regression models will be made defunct in `spdep` in future releases, and will only be available in `spatialreg`.
+
+#### SAR
+
+Lets estimate a spatial SAR model using the `lagsarlm()` with contiguity weights. Here we use the median housing values as depended variable. We include population density (`POPDEN`), the percentage of tree cover (`canopy_per`), and the number of pubs (`pubs_count`)
+
+```{r}
+hv_1.sar <- lagsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+                     data = msoa.spdf, 
+                     listw = queens.lw,
+                     Durbin = FALSE) # we could here extend to SDM
+summary(hv_1.sar)
+
+```
+
+This looks pretty much like a conventional model output, with some additional information: a highly significant `hv_1.sar$rho` of `r round(hv_1.sar$rho, 2)` indicates strong positive spatial autocorrelation. In substantive terms, housing prices in the focal unit positively influence housing prices in neighbouring units, which again influences housing prices among the neighbours of these neighbours, and so on.
+
+__NOTE__: interpreting the coefficients or covariates in a SAR model seldomly makes sense, because of the spillovers and feedback loops in $\bm y$ mentioned above!
+
+#### SEM
+
+SEM models can be estimated using `errorsarlm()`.
+
+```{r}
+hv_1.sem <- errorsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+                     data = msoa.spdf, 
+                     listw = queens.lw,
+                     Durbin = FALSE) # we could here extend to SDM
+summary(hv_1.sem)
+
+```
+
+In this case `hv_1.sem$lambda` gives us the spatial parameter. In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model. 
+
+#### SLX
+
+Above, we could have estimated SDM and SDEM models using the `Durbin` option. To estimate SLX models, we can either use `lmSLX()` directly, or we can create $\bm W \bm X$ manually and use that in any available model fitting function.
+
+```{r}
+hv_1.slx <- lmSLX(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+                  data = msoa.spdf, 
+                  listw = queens.lw, 
+                  Durbin = TRUE) # use a formula to lag only specific covariates
+summary(hv_1.slx)
+
+```
+
+In SLX models, we receive the direct effects of covariates as well as the effects of the spatially lagged variables. Here, we can interpret the coefficients directly. For instance, lets look at population density: 1) a high population density in the focal unit is related to lower housing prices, but 2) a high population density in the neighbouring areas in related to higher housing prices (while keeping population density in the focal unit constant). This might indicate that areas with a low population density in central regions of the city (high pop density around) have higher housing prices. We could try testing this interpretation by including the distance to the city centre as a control.
+
+Another way of estimating the same model is lagging the covariates first.
+
+```{r}
+# Loop through vars and create lagged variables
+msoa.spdf$log_POPDEN <- log(msoa.spdf$POPDEN)
+vars <- c("Value", "log_POPDEN", "canopy_per", "pubs_count")
+for(v in vars){
+  msoa.spdf[, paste0("w.", v)] <- lag.listw(queens.lw,
+                                            var = st_drop_geometry(msoa.spdf)[, v])
+}
+
+# Alternatively:
+w_vars <- create_WX(st_drop_geometry(msoa.spdf[, vars]),
+                    listw = queens.lw,
+                    prefix="w")
+
+head(w_vars)
+
+```
+
+And subsequently we use those new variable in a linear model.
+
+```{r}
+hv_1.lm <- lm (log(Value) ~ log(POPDEN) + canopy_per + pubs_count +
+                 w.log_POPDEN + w.canopy_per + w.pubs_count,
+               data = msoa.spdf)
+summary(hv_1.lm)
+
+```
+
+Looks pretty similar to `lmSLX()` results, and it should! A big advantage of the SLX specification is that we can use the lagged variables in basically all methods which take variables as inputs, such as non-linear models, matching algorithms, and machine learning tools.
+
+Moreover, using the lagged variables gives a high degree of freedom. For instance, we could (not saying that it necessarily makes sense):
+
+* Use different weights matrices for different variables
+
+* Include higher order neighbours using `nblag()` on the neigbours list (with increasing number of orders we go towards a more global model, but we estimate a coefficient for each spillover, instead of estiamting just one)
+
+* Use machine learning techniques to determine the best fitting weights specification
+
+
 ### Impacts
 
 #### Coefficient estimates $\neq$ `marginal' effects
@@ -384,7 +483,28 @@ The different indirect effects / spatial effects mean conceptionally different t
 
 * Local spillover effects: SLX, SDEM
 
+We can calculate these impacts using `impacts()` with simulated distributions, e.g. for the SAR model:
 
+```{r}
+hv_1.sar.imp <- impacts(hv_1.sar, listw = queens.lw, R = 300)
+summary(hv_1.sar.imp, zstats = TRUE, short = TRUE)
+
+# Alternative with traces (better for large W)
+W <- as(queens.lw, "CsparseMatrix")
+trMatc <- trW(W, type="mult")
+hv_1.sar.imp2 <- impacts(hv_1.sar, tr = trMatc, R = 300, Q = 10)
+summary(hv_1.sar.imp2, zstats = TRUE, short = TRUE)
+
+```
+
+The indirect effects here refer to global spillover effects. This means a change of $x$ in the focal units flows through the entire system of neighbours (direct nieightbours, neighbours of neighbours, ...) influencing $y$. One can think of this as diffusion in time or a change in long-term equilibrium.
+
+For SLX models, nothing is gained from computing the impacts
+
+```{r}
+print(impacts(hv_1.slx, listw = queens.lw))
+
+```
 
 
 ### References

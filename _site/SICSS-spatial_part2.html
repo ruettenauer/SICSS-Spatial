@@ -356,6 +356,9 @@ div.tocify {
 <li>
   <a href="SICSS-spatial_part2.html">Part 2: Analysing spatial data</a>
 </li>
+<li>
+  <a href="SICSS-spatial_part3.html">Practical exercises</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -377,7 +380,7 @@ div.tocify {
 
 <div id="required-packages" class="section level3">
 <h3>Required packages</h3>
-<pre class="r"><code>pkgs &lt;- c(&quot;sf&quot;, &quot;mapview&quot;, &quot;spatialreg&quot;, &quot;spdep&quot;, &quot;tmap&quot;, &quot;viridisLite&quot;)
+<pre class="r"><code>pkgs &lt;- c(&quot;sf&quot;, &quot;mapview&quot;, &quot;spdep&quot;, &quot;spatialreg&quot;, &quot;tmap&quot;, &quot;viridisLite&quot;) # note: load spdep first, then spatialreg
 lapply(pkgs, require, character.only = TRUE)</code></pre>
 </div>
 <div id="session-info" class="section level3">
@@ -385,7 +388,7 @@ lapply(pkgs, require, character.only = TRUE)</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.1.0 (2021-05-18)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 18362)
+## Running under: Windows 10 x64 (build 19042)
 ## 
 ## Matrix products: default
 ## 
@@ -400,30 +403,41 @@ lapply(pkgs, require, character.only = TRUE)</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] viridisLite_0.4.0 tmap_3.3-1        spdep_1.1-8       sp_1.4-5         
-## [5] spatialreg_1.1-8  Matrix_1.3-3      spData_0.3.8      mapview_2.10.0   
-## [9] sf_1.0-0         
+##  [1] viridisLite_0.4.0   tmap_3.3-1          spatialreg_1.1-8   
+##  [4] Matrix_1.3-3        spdep_1.1-8         spData_0.3.8       
+##  [7] sp_1.4-5            dplyr_1.0.6         rnaturalearth_0.1.0
+## [10] nngeo_0.4.3         mapview_2.10.0      sf_1.0-0           
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] sass_0.4.0         jsonlite_1.7.2     splines_4.1.0      gtools_3.9.2      
-##  [5] bslib_0.2.5.1      expm_0.999-6       stats4_4.1.0       yaml_2.2.1        
-##  [9] LearnBayes_2.15.1  pillar_1.6.1       lattice_0.20-44    glue_1.4.2        
-## [13] digest_0.6.27      RColorBrewer_1.1-2 colorspace_2.0-1   htmltools_0.5.1.1 
-## [17] XML_3.99-0.6       pkgconfig_2.0.3    raster_3.4-10      stars_0.5-3       
-## [21] gmodels_2.18.1     purrr_0.3.4        scales_1.1.1       webshot_0.5.2     
-## [25] gdata_2.18.0       satellite_1.0.2    tibble_3.1.2       proxy_0.4-26      
-## [29] generics_0.1.0     ellipsis_0.3.2     leafsync_0.1.0     magrittr_2.0.1    
-## [33] crayon_1.4.1       deldir_0.2-10      evaluate_0.14      fansi_0.5.0       
-## [37] nlme_3.1-152       MASS_7.3-54        lwgeom_0.2-6       class_7.3-19      
-## [41] tools_4.1.0        lifecycle_1.0.0    stringr_1.4.0      munsell_0.5.0     
-## [45] compiler_4.1.0     jquerylib_0.1.4    e1071_1.7-7        rlang_0.4.11      
-## [49] tmaptools_3.1-1    classInt_0.4-3     units_0.7-2        grid_4.1.0        
-## [53] dichromat_2.0-0    htmlwidgets_1.5.3  crosstalk_1.1.1    leafem_0.1.6      
-## [57] base64enc_0.1-3    rmarkdown_2.8      boot_1.3-28        codetools_0.2-18  
-## [61] abind_1.4-5        DBI_1.1.1          R6_2.5.0           knitr_1.33        
-## [65] dplyr_1.0.6        utf8_1.2.1         KernSmooth_2.23-20 stringi_1.6.2     
-## [69] parallel_4.1.0     Rcpp_1.0.6         vctrs_0.3.8        png_0.1-7         
-## [73] leaflet_2.0.4.1    tidyselect_1.1.1   xfun_0.23          coda_0.19-4</code></pre>
+##  [1] sass_0.4.0              jsonlite_1.7.2          splines_4.1.0          
+##  [4] gtools_3.9.2            bslib_0.2.5.1           expm_0.999-6           
+##  [7] highr_0.9               stats4_4.1.0            yaml_2.2.1             
+## [10] LearnBayes_2.15.1       pillar_1.6.1            lattice_0.20-44        
+## [13] glue_1.4.2              uuid_0.1-4              digest_0.6.27          
+## [16] RColorBrewer_1.1-2      colorspace_2.0-1        leaflet.providers_1.9.0
+## [19] htmltools_0.5.1.1       XML_3.99-0.6            pkgconfig_2.0.3        
+## [22] raster_3.4-10           stars_0.5-3             gmodels_2.18.1         
+## [25] purrr_0.3.4             scales_1.1.1            webshot_0.5.2          
+## [28] gdata_2.18.0            brew_1.0-6              svglite_2.0.0          
+## [31] satellite_1.0.2         tibble_3.1.2            proxy_0.4-26           
+## [34] generics_0.1.0          farver_2.1.0            ellipsis_0.3.2         
+## [37] leafsync_0.1.0          magrittr_2.0.1          crayon_1.4.1           
+## [40] deldir_0.2-10           evaluate_0.14           fansi_0.5.0            
+## [43] nlme_3.1-152            MASS_7.3-54             lwgeom_0.2-6           
+## [46] class_7.3-19            tools_4.1.0             lifecycle_1.0.0        
+## [49] stringr_1.4.0           munsell_0.5.0           compiler_4.1.0         
+## [52] jquerylib_0.1.4         e1071_1.7-7             systemfonts_1.0.2      
+## [55] rlang_0.4.11            tmaptools_3.1-1         classInt_0.4-3         
+## [58] units_0.7-2             grid_4.1.0              leafpop_0.1.0          
+## [61] dichromat_2.0-0         htmlwidgets_1.5.3       crosstalk_1.1.1        
+## [64] leafem_0.1.6            base64enc_0.1-3         rmarkdown_2.8          
+## [67] boot_1.3-28             codetools_0.2-18        abind_1.4-5            
+## [70] DBI_1.1.1               R6_2.5.0                knitr_1.33             
+## [73] rgeos_0.5-5             utf8_1.2.1              KernSmooth_2.23-20     
+## [76] stringi_1.6.2           parallel_4.1.0          Rcpp_1.0.6             
+## [79] vctrs_0.3.8             png_0.1-7               leaflet_2.0.4.1        
+## [82] tidyselect_1.1.1        xfun_0.23               rnaturalearthdata_0.1.0
+## [85] coda_0.19-4</code></pre>
 </div>
 <div id="load-spatial-data" class="section level3">
 <h3>Load spatial data</h3>
@@ -477,17 +491,17 @@ lapply(pkgs, require, character.only = TRUE)</code></pre>
 <pre class="r"><code># Contiguity (Queens) neighbours weights
 queens.nb &lt;- poly2nb(msoa.spdf, 
                      queen = TRUE, 
-                     snap = 10) # Snap specifies that we consider points in 10m distance &#39;as touching&#39;
+                     snap = 1) # we consider points in 1m distance as &#39;touching&#39;
 summary(queens.nb)</code></pre>
 <pre><code>## Neighbour list object:
 ## Number of regions: 983 
-## Number of nonzero links: 5636 
-## Percentage nonzero weights: 0.5832624 
-## Average number of links: 5.733469 
+## Number of nonzero links: 5620 
+## Percentage nonzero weights: 0.5816065 
+## Average number of links: 5.717192 
 ## Link number distribution:
 ## 
 ##   2   3   4   5   6   7   8   9  10  11  12  13 
-##   9  39 131 263 280 165  63  19   6   5   2   1 
+##   9  40 132 268 279 159  63  19   6   5   2   1 
 ## 9 least connected regions:
 ## 160 270 475 490 597 729 755 778 861 with 2 links
 ## 1 most connected region:
@@ -583,13 +597,13 @@ summary(queens.lw)</code></pre>
 <pre><code>## Characteristics of weights list object:
 ## Neighbour list object:
 ## Number of regions: 983 
-## Number of nonzero links: 5636 
-## Percentage nonzero weights: 0.5832624 
-## Average number of links: 5.733469 
+## Number of nonzero links: 5620 
+## Percentage nonzero weights: 0.5816065 
+## Average number of links: 5.717192 
 ## Link number distribution:
 ## 
 ##   2   3   4   5   6   7   8   9  10  11  12  13 
-##   9  39 131 263 280 165  63  19   6   5   2   1 
+##   9  40 132 268 279 159  63  19   6   5   2   1 
 ## 9 least connected regions:
 ## 160 270 475 490 597 729 755 778 861 with 2 links
 ## 1 most connected region:
@@ -597,8 +611,8 @@ summary(queens.lw)</code></pre>
 ## 
 ## Weights style: W 
 ## Weights constants summary:
-##     n     nn  S0       S1       S2
-## W 983 966289 983 355.6524 4017.751</code></pre>
+##     n     nn  S0       S1      S2
+## W 983 966289 983 356.6902 4018.36</code></pre>
 </div>
 <div id="maximum-eigenvalues-normalization" class="section level4">
 <h4>Maximum eigenvalues normalization</h4>
@@ -697,11 +711,11 @@ moran.test(msoa.spdf$Value, listw = queens.lw, alternative = &quot;two.sided&quo
 ## data:  msoa.spdf$Value  
 ## weights: queens.lw    
 ## 
-## Moran I statistic standard deviate = 37.274, p-value &lt; 2.2e-16
+## Moran I statistic standard deviate = 37.238, p-value &lt; 2.2e-16
 ## alternative hypothesis: two.sided
 ## sample estimates:
 ## Moran I statistic       Expectation          Variance 
-##       0.706448649      -0.001018330       0.000360248</code></pre>
+##      0.7068094990     -0.0010183299      0.0003613048</code></pre>
 <pre class="r"><code># Global Morans I test of housing values based on idw
 moran.test(msoa.spdf$Value, listw = idw.lw, alternative = &quot;two.sided&quot;)</code></pre>
 <pre><code>## 
@@ -791,6 +805,177 @@ Moreover, there are models combining two sets of the above specifications.</p>
 <p>Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies <span class="citation">(<a href="#ref-HalleckVega.2015.0" role="doc-biblioref">Halleck Vega and Elhorst 2015</a>; <a href="#ref-Ruttenauer.2019c" role="doc-biblioref">Rüttenauer 2019</a>; <a href="#ref-Wimpy.2021" role="doc-biblioref">Wimpy, Whitten, and Williams 2021</a>)</span> highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.</p>
 </div>
 </div>
+<div id="spatial-regression-models-example" class="section level3">
+<h3>Spatial Regression Models: Example</h3>
+<p>To estimate spatial models, we can currently use <code>spdep</code> or <code>spatialreg</code>. They contain the same functions, but spatial regression models will be made defunct in <code>spdep</code> in future releases, and will only be available in <code>spatialreg</code>.</p>
+<div id="sar" class="section level4">
+<h4>SAR</h4>
+<p>Lets estimate a spatial SAR model using the <code>lagsarlm()</code> with contiguity weights. Here we use the median housing values as depended variable. We include population density (<code>POPDEN</code>), the percentage of tree cover (<code>canopy_per</code>), and the number of pubs (<code>pubs_count</code>)</p>
+<pre class="r"><code>hv_1.sar &lt;- lagsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+                     data = msoa.spdf, 
+                     listw = queens.lw,
+                     Durbin = FALSE) # we could here extend to SDM
+summary(hv_1.sar)</code></pre>
+<pre><code>## 
+## Call:lagsarlm(formula = log(Value) ~ log(POPDEN) + canopy_per + pubs_count, 
+##     data = msoa.spdf, listw = queens.lw, Durbin = FALSE)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.701583 -0.126770 -0.013526  0.113585  0.885312 
+## 
+## Type: lag 
+## Coefficients: (asymptotic standard errors) 
+##                Estimate  Std. Error z value  Pr(&gt;|z|)
+## (Intercept)  2.34991935  0.26979188  8.7101 &lt; 2.2e-16
+## log(POPDEN) -0.00656500  0.01010056 -0.6500    0.5157
+## canopy_per   0.00437247  0.00096848  4.5148 6.338e-06
+## pubs_count   0.00339695  0.00066231  5.1289 2.914e-07
+## 
+## Rho: 0.81488, LR test value: 812.14, p-value: &lt; 2.22e-16
+## Asymptotic standard error: 0.020564
+##     z-value: 39.627, p-value: &lt; 2.22e-16
+## Wald statistic: 1570.3, p-value: &lt; 2.22e-16
+## 
+## Log likelihood: 81.90148 for lag model
+## ML residual variance (sigma squared): 0.041654, (sigma: 0.20409)
+## Number of observations: 983 
+## Number of parameters estimated: 6 
+## AIC: -151.8, (AIC for lm: 658.33)
+## LM test for residual autocorrelation
+## test value: 43.85, p-value: 3.5444e-11</code></pre>
+<p>This looks pretty much like a conventional model output, with some additional information: a highly significant <code>hv_1.sar$rho</code> of 0.81 indicates strong positive spatial autocorrelation. In substantive terms, housing prices in the focal unit positively influence housing prices in neighbouring units, which again influences housing prices among the neighbours of these neighbours, and so on.</p>
+<p><strong>NOTE</strong>: interpreting the coefficients or covariates in a SAR model seldomly makes sense, because of the spillovers and feedback loops in <span class="math inline">\(\boldsymbol{\mathbf{y}}\)</span> mentioned above!</p>
+</div>
+<div id="sem" class="section level4">
+<h4>SEM</h4>
+<p>SEM models can be estimated using <code>errorsarlm()</code>.</p>
+<pre class="r"><code>hv_1.sem &lt;- errorsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+                     data = msoa.spdf, 
+                     listw = queens.lw,
+                     Durbin = FALSE) # we could here extend to SDM
+summary(hv_1.sem)</code></pre>
+<pre><code>## 
+## Call:errorsarlm(formula = log(Value) ~ log(POPDEN) + canopy_per + 
+##     pubs_count, data = msoa.spdf, listw = queens.lw, Durbin = FALSE)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -0.6517136 -0.1255899 -0.0090777  0.1069794  0.7484496 
+## 
+## Type: error 
+## Coefficients: (asymptotic standard errors) 
+##                Estimate  Std. Error  z value  Pr(&gt;|z|)
+## (Intercept) 13.32527965  0.09204716 144.7658 &lt; 2.2e-16
+## log(POPDEN) -0.08515645  0.01498954  -5.6811 1.339e-08
+## canopy_per   0.00689488  0.00157390   4.3807 1.183e-05
+## pubs_count   0.00078552  0.00078907   0.9955    0.3195
+## 
+## Lambda: 0.85212, LR test value: 837.93, p-value: &lt; 2.22e-16
+## Asymptotic standard error: 0.018563
+##     z-value: 45.903, p-value: &lt; 2.22e-16
+## Wald statistic: 2107.1, p-value: &lt; 2.22e-16
+## 
+## Log likelihood: 94.7968 for error model
+## ML residual variance (sigma squared): 0.039582, (sigma: 0.19895)
+## Number of observations: 983 
+## Number of parameters estimated: 6 
+## AIC: -177.59, (AIC for lm: 658.33)</code></pre>
+<p>In this case <code>hv_1.sem$lambda</code> gives us the spatial parameter. In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model.</p>
+</div>
+<div id="slx" class="section level4">
+<h4>SLX</h4>
+<p>Above, we could have estimated SDM and SDEM models using the <code>Durbin</code> option. To estimate SLX models, we can either use <code>lmSLX()</code> directly, or we can create <span class="math inline">\(\boldsymbol{\mathbf{W}} \boldsymbol{\mathbf{X}}\)</span> manually and use that in any available model fitting function.</p>
+<pre class="r"><code>hv_1.slx &lt;- lmSLX(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+                  data = msoa.spdf, 
+                  listw = queens.lw, 
+                  Durbin = TRUE) # use a formula to lag only specific covariates
+summary(hv_1.slx)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = formula(paste(&quot;y ~ &quot;, paste(colnames(x)[-1], collapse = &quot;+&quot;))), 
+##     data = as.data.frame(x), weights = weights)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.79338 -0.19863 -0.04346  0.16392  1.39421 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     11.688384   0.102148 114.426  &lt; 2e-16 ***
+## log.POPDEN.     -0.060335   0.023521  -2.565 0.010461 *  
+## canopy_per       0.008649   0.002597   3.330 0.000899 ***
+## pubs_count       0.003553   0.001233   2.882 0.004032 ** 
+## lag.log.POPDEN.  0.289264   0.029571   9.782  &lt; 2e-16 ***
+## lag.canopy_per   0.010337   0.003412   3.030 0.002512 ** 
+## lag.pubs_count   0.015908   0.001691   9.407  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3102 on 976 degrees of freedom
+## Multiple R-squared:  0.2924, Adjusted R-squared:  0.288 
+## F-statistic:  67.2 on 6 and 976 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>In SLX models, we receive the direct effects of covariates as well as the effects of the spatially lagged variables. Here, we can interpret the coefficients directly. For instance, lets look at population density: 1) a high population density in the focal unit is related to lower housing prices, but 2) a high population density in the neighbouring areas in related to higher housing prices (while keeping population density in the focal unit constant). This might indicate that areas with a low population density in central regions of the city (high pop density around) have higher housing prices. We could try testing this interpretation by including the distance to the city centre as a control.</p>
+<p>Another way of estimating the same model is lagging the covariates first.</p>
+<pre class="r"><code># Loop through vars and create lagged variables
+msoa.spdf$log_POPDEN &lt;- log(msoa.spdf$POPDEN)
+vars &lt;- c(&quot;Value&quot;, &quot;log_POPDEN&quot;, &quot;canopy_per&quot;, &quot;pubs_count&quot;)
+for(v in vars){
+  msoa.spdf[, paste0(&quot;w.&quot;, v)] &lt;- lag.listw(queens.lw,
+                                            var = st_drop_geometry(msoa.spdf)[, v])
+}
+
+# Alternatively:
+w_vars &lt;- create_WX(st_drop_geometry(msoa.spdf[, vars]),
+                    listw = queens.lw,
+                    prefix=&quot;w&quot;)
+
+head(w_vars)</code></pre>
+<pre><code>##       w.Value w.log_POPDEN w.canopy_per w.pubs_count
+## [1,] 843550.0     4.662014     9.201539    37.000000
+## [2,] 353666.7     3.300901    19.324093     1.333333
+## [3,] 329000.0     4.009795    15.861733     1.571429
+## [4,] 337000.0     3.630360    25.492108     1.400000
+## [5,] 316650.0     3.993660    17.011171     1.000000
+## [6,] 317375.0     3.876070    23.598908     1.000000</code></pre>
+<p>And subsequently we use those new variable in a linear model.</p>
+<pre class="r"><code>hv_1.lm &lt;- lm (log(Value) ~ log(POPDEN) + canopy_per + pubs_count +
+                 w.log_POPDEN + w.canopy_per + w.pubs_count,
+               data = msoa.spdf)
+summary(hv_1.lm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log(Value) ~ log(POPDEN) + canopy_per + pubs_count + 
+##     w.log_POPDEN + w.canopy_per + w.pubs_count, data = msoa.spdf)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.79338 -0.19863 -0.04346  0.16392  1.39421 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  11.688384   0.102148 114.426  &lt; 2e-16 ***
+## log(POPDEN)  -0.060335   0.023521  -2.565 0.010461 *  
+## canopy_per    0.008649   0.002597   3.330 0.000899 ***
+## pubs_count    0.003553   0.001233   2.882 0.004032 ** 
+## w.log_POPDEN  0.289264   0.029571   9.782  &lt; 2e-16 ***
+## w.canopy_per  0.010337   0.003412   3.030 0.002512 ** 
+## w.pubs_count  0.015908   0.001691   9.407  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3102 on 976 degrees of freedom
+## Multiple R-squared:  0.2924, Adjusted R-squared:  0.288 
+## F-statistic:  67.2 on 6 and 976 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Looks pretty similar to <code>lmSLX()</code> results, and it should! A big advantage of the SLX specification is that we can use the lagged variables in basically all methods which take variables as inputs, such as non-linear models, matching algorithms, and machine learning tools.</p>
+<p>Moreover, using the lagged variables gives a high degree of freedom. For instance, we could (not saying that it necessarily makes sense):</p>
+<ul>
+<li><p>Use different weights matrices for different variables</p></li>
+<li><p>Include higher order neighbours using <code>nblag()</code> on the neigbours list (with increasing number of orders we go towards a more global model, but we estimate a coefficient for each spillover, instead of estiamting just one)</p></li>
+<li><p>Use machine learning techniques to determine the best fitting weights specification</p></li>
+</ul>
+</div>
+</div>
 <div id="impacts" class="section level3">
 <h3>Impacts</h3>
 <div id="coefficient-estimates-neq-marginal-effects" class="section level4">
@@ -859,6 +1044,72 @@ where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> 
 <li><p>Global spillover effects: SAR, SAC, SDM</p></li>
 <li><p>Local spillover effects: SLX, SDEM</p></li>
 </ul>
+<p>We can calculate these impacts using <code>impacts()</code> with simulated distributions, e.g. for the SAR model:</p>
+<pre class="r"><code>hv_1.sar.imp &lt;- impacts(hv_1.sar, listw = queens.lw, R = 300)
+summary(hv_1.sar.imp, zstats = TRUE, short = TRUE)</code></pre>
+<pre><code>## Impact measures (lag, exact):
+##                   Direct    Indirect       Total
+## log(POPDEN) -0.008216925 -0.02724569 -0.03546261
+## canopy_per   0.005472698  0.01814638  0.02361907
+## pubs_count   0.004251709  0.01409782  0.01834953
+## ========================================================
+## Simulation results ( variance matrix):
+## ========================================================
+## Simulated standard errors
+##                   Direct    Indirect       Total
+## log(POPDEN) 0.0133116737 0.046286771 0.059516113
+## canopy_per  0.0013067735 0.004500021 0.005675619
+## pubs_count  0.0008021718 0.003331039 0.004029913
+## 
+## Simulated z-values:
+##                 Direct   Indirect      Total
+## log(POPDEN) -0.5104614 -0.4995427 -0.5026759
+## canopy_per   4.1932706  4.0865128  4.2055413
+## pubs_count   5.3402741  4.3464561  4.6556926
+## 
+## Simulated p-values:
+##             Direct     Indirect   Total     
+## log(POPDEN) 0.60973    0.6174     0.61519   
+## canopy_per  2.7496e-05 4.3791e-05 2.6046e-05
+## pubs_count  9.2806e-08 1.3835e-05 3.2289e-06</code></pre>
+<pre class="r"><code># Alternative with traces (better for large W)
+W &lt;- as(queens.lw, &quot;CsparseMatrix&quot;)
+trMatc &lt;- trW(W, type=&quot;mult&quot;)
+hv_1.sar.imp2 &lt;- impacts(hv_1.sar, tr = trMatc, R = 300, Q = 10)
+summary(hv_1.sar.imp2, zstats = TRUE, short = TRUE)</code></pre>
+<pre><code>## Impact measures (lag, trace):
+##                   Direct    Indirect       Total
+## log(POPDEN) -0.008216080 -0.02717024 -0.03538632
+## canopy_per   0.005472135  0.01809612  0.02356826
+## pubs_count   0.004251272  0.01405878  0.01831005
+## ========================================================
+## Simulation results ( variance matrix):
+## ========================================================
+## Simulated standard errors
+##                   Direct    Indirect       Total
+## log(POPDEN) 0.0132921855 0.046014632 0.059215583
+## canopy_per  0.0011358850 0.004281024 0.005295750
+## pubs_count  0.0008360857 0.003164799 0.003892459
+## 
+## Simulated z-values:
+##                 Direct   Indirect      Total
+## log(POPDEN) -0.6186894 -0.6033781 -0.6077446
+## canopy_per   4.8220746  4.3060442  4.5152434
+## pubs_count   5.1119758  4.5422384  4.7911422
+## 
+## Simulated p-values:
+##             Direct     Indirect  Total     
+## log(POPDEN) 0.53612    0.54626   0.54336   
+## canopy_per  1.4207e-06 1.662e-05 6.3244e-06
+## pubs_count  3.1881e-07 5.566e-06 1.6583e-06</code></pre>
+<p>The indirect effects here refer to global spillover effects. This means a change of <span class="math inline">\(x\)</span> in the focal units flows through the entire system of neighbours (direct nieightbours, neighbours of neighbours, …) influencing <span class="math inline">\(y\)</span>. One can think of this as diffusion in time or a change in long-term equilibrium.</p>
+<p>For SLX models, nothing is gained from computing the impacts</p>
+<pre class="r"><code>print(impacts(hv_1.slx, listw = queens.lw))</code></pre>
+<pre><code>## Impact measures (SlX, estimable):
+##                   Direct   Indirect      Total
+## log(POPDEN) -0.060334591 0.28926384 0.22892925
+## canopy_per   0.008649132 0.01033740 0.01898653
+## pubs_count   0.003552843 0.01590812 0.01946096</code></pre>
 </div>
 </div>
 <div id="references" class="section level3 unnumbered">

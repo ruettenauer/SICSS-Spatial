@@ -10,3 +10,5 @@ navbar:
       href: SICSS-spatial_part1.html
     - text: "Part 2: Analysing spatial data"
       href: SICSS-spatial_part2.html  
+    - text: "Practical exercises"
+      href: SICSS-spatial_part3.html  
