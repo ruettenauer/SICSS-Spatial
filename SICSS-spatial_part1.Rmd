@@ -19,7 +19,7 @@ link-citations: yes
 ### Required packages
 
 ```{r, message = FALSE, warning = FALSE, results = 'hide'}
-pkgs <- c("sf", "mapview", "nngeo", "rnaturalearth", "dplyr") 
+pkgs <- c("sf", "gstat", "mapview", "nngeo", "rnaturalearth", "dplyr") 
 lapply(pkgs, require, character.only = TRUE)
 
 ```
@@ -81,7 +81,7 @@ mapview(nuffield.spdf, zcol = "name")
 
 ## Why different projections?
 
-By now, (most) people agree that the earth is not flat. So, to plot data on a 2D planar surface and to perform certain operations on a planar world, we need to make some re-projections. Depending on where we are, different re-projections of our data might work better than others.
+By now, (most) people agree that [the earth is not flat](https://r-spatial.org/r/2020/06/17/s2.html). So, to plot data on a 2D planar surface and to perform certain operations on a planar world, we need to make some re-projections. Depending on where we are, different re-projections of our data might work better than others.
 
 ```{r}
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -122,7 +122,7 @@ unlink(tmpf)
 
 # We only need the MSOA layer for now
 msoa.spdf <- st_read(dsn = paste0(dn, "/statistical-gis-boundaries-london/ESRI"),
-                     layer = "MSOA_2011_London_gen_MHW" # Note: no file ending, as all of them are required
+                     layer = "MSOA_2011_London_gen_MHW" # Note: no file ending
                      )
 head(msoa.spdf)
 
@@ -205,7 +205,7 @@ culture.link <- "https://data.london.gov.uk/download/cultural-infrastructure-map
 tmpf <- tempfile(fileext = ".gpkg")
 download.file(culture.link, destfile = tmpf, mode = "wb")
 
-# And we only load the layer containig pubs
+# And we only load the layer containing pubs
 st_layers(tmpf)
 pubs.spdf <- st_read(dsn = tmpf, layer = "Pubs")
 unlink(tmpf)
@@ -329,10 +329,118 @@ buf_hex.int <- aggregate(list(canopy_per = buf_hex.int$canopy_per),
 # Merge back to spatial data.frame
 msoa.spdf <- merge(msoa.spdf, buf_hex.int, by = "MSOA11CD", all.x = TRUE)
 
-
 ```
 
 Note: For buffer related methods it often makes sense to use a population weighted centroid instead of geographic centroid (see [here](https://geoportal.statistics.gov.uk/datasets/ons::middle-layer-super-output-areas-december-2011-population-weighted-centroids/about) for MSOA population weighted centroids). However, often this information is not available.
+
+# Interpolation and Kriging
+
+For (sparse) point data, we often have the problem that the nearest count point might be far away from where we want to measure or merge its attributes. One way of dealing with this problem is to spatially interpolate the data on regular grid given: given a specific function of space (and covariates), we make prediction about an attribute at "missing" locations. For more details, see for instance [Spatial Data Science](https://keen-swartz-3146c4.netlify.app/interpolation.html) or [Introduction to Spatial Data Programming with R](https://keen-swartz-3146c4.netlify.app/interpolation.html).
+
+First lets get some point data with associated attributes or measures. In this example, we use traffic counts provided by the [Department for Transport](https://roadtraffic.dft.gov.uk/regions/6).
+
+
+
+```{r}
+# Download
+traffic.link <- "https://dft-statistics.s3.amazonaws.com/road-traffic/downloads/aadf/region_id/dft_aadf_region_id_6.csv"
+traffic.df <- read.csv(traffic.link)
+traffic.df <- traffic.df[which(traffic.df$year == 2017 & 
+                       traffic.df$road_type == "Major"), ]
+names(traffic.df)
+
+# Transform to spatial data
+traffic.spdf <- st_as_sf(traffic.df, 
+                         coords = c("longitude", "latitude"), 
+                         crs = 4326)
+
+# Transform into common crs
+traffic.spdf <- st_transform(traffic.spdf, 
+                             crs = st_crs(msoa.spdf))
+
+# Map
+mapview(traffic.spdf[, "all_motor_vehicles"])
+
+```
+
+To interpolate, we first create a grid surface over London on which we make predictions.
+
+```{r}
+# Set up regular grid over London with 1km cell size
+london.sp <- st_union(st_geometry(msoa.spdf))
+grid <- st_make_grid(london.sp, cellsize = 1000)
+mapview(grid)
+
+# Reduce to London bounds
+grid <- grid[london.sp]
+mapview(grid)
+
+
+```
+
+There are various ways of interpolating. Common methods are nearest neighbours matching or inverse distance weighted interpolation (e.g. using `idw()`), where the value at a given point is a weighted average of surrounding values, with weights being a function of distance.
+
+```{r}
+# IDW interpolation
+all_motor.idw <- idw(all_motor_vehicles ~ 1, 
+                     locations = traffic.spdf, 
+                     newdata = grid, 
+                     idp = 2) # power of distance decay
+mapview(all_motor.idw[, "var1.pred"])
+```
+
+IDW is a fairly simple way of interpolation and it assumes a deterministic form of spatial dependence.
+
+A more advantage technique is Kriging, which estimates values as a function of a deterministic trend a random process. However, we have to set some hyper-parameters for that: sill, range, nugget, and the functional form. Therefore, we first need to fit a semi-variogram. Subsequently, we let the `fit.variogram()` function chose the the parameters based on the empirical variogram [see for instance [r-spatial Homepage](https://r-spatial.org/r/2016/02/14/gstat-variogram-fitting.html)].
+
+
+```{r}
+# Variogram
+all_motor.var <- variogram(all_motor_vehicles ~ 1, 
+                          traffic.spdf)
+plot(all_motor.var)
+
+# Fit variogram
+all_motor.varfit <- fit.variogram(all_motor.var, 
+                                  vgm(c("Nug", "Exp")), # use vgm() to see options
+                                  fit.kappa = TRUE, fit.sills = TRUE, fit.ranges = TRUE)
+
+plot(all_motor.var, all_motor.varfit)
+
+# Parameters
+all_motor.varfit
+
+
+### Ordinary Kriging (ATTENTION: This can take some time!)
+
+all_motor.kg <- krige(all_motor_vehicles ~ 1,
+                      locations = traffic.spdf,
+                      newdata = grid, 
+                      model = all_motor.varfit)
+
+# Look at results
+mapview(all_motor.kg[, "var1.pred"])
+
+```
+
+The example above is a little bit tricky, given that traffic does not follow a random process, but (usually) follows the street network. We would probably increase the performance by either adding the street network itself and interpolating along this network, or by adding covariates to our prediction (Universal Kriging). Alternatively, we can use integrated nested Laplace approximation with [R-INLA](https://becarioprecario.bitbucket.io/inla-gitbook/index.html) [@GomezRubio.2020].
+
+Lets add the prediction to our original msoa data using the insection operation as above.
+
+
+```{r}
+# Calculate intersection
+smoa_grid.int <- st_intersection(msoa.spdf, all_motor.kg)
+
+# average per MSOA
+smoa_grid.int <- aggregate(list(traffic = smoa_grid.int$var1.pred),
+                         by = list(MSOA11CD = smoa_grid.int$MSOA11CD),
+                         mean)
+
+# Merge back
+msoa.spdf <- merge(msoa.spdf, smoa_grid.int, by = "MSOA11CD", all.x = TRUE)
+
+```
 
 ### Save spatial data
 

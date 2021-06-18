@@ -358,12 +358,20 @@ div.tocify {
 <li>The function <code>nblag()</code> is helpful.</li>
 </ul></li>
 </ol>
+</div>
+<div id="more-exercises" class="section level1">
+<h1>More exercises</h1>
 <p>In case you are interested in geo-spatial data analysis, try the following. Note that this might be a bit more tricky and may require some time.</p>
 <ol start="4" style="list-style-type: decimal">
-<li><p>Try adding the amount of particulate matter (PM10, e.g. 2017) from Defra: <a href="https://uk-air.defra.gov.uk/data/pcm-data" class="uri">https://uk-air.defra.gov.uk/data/pcm-data</a>.</p>
+<li><p>Add the amount of particulate matter (PM10, e.g. 2017) from <a href="https://uk-air.defra.gov.uk/data/pcm-data">Defra</a> and check if pollution influences the housing prices.</p>
 <ul>
 <li><p>Note the following important sentence: “The coordinate system is OSGB and the coordinates represent the centre of each 1x1km cell.”</p></li>
 <li><p><code>st_buffer</code>with the options <code>nQuadSegs  = 1, endCapStyle = 'SQUARE'</code> provides an easy way to get points into grids</p></li>
+</ul></li>
+<li><p>Add some more demographic variables from the Census 2011.</p>
+<ul>
+<li><p>The <code>nomisr</code> package provides an API to nomis. See the <a href="https://cran.r-project.org/web/packages/nomisr/vignettes/introduction.html">Vignette</a>. Make sure to restrict you request to London only (Guest users are limited to 25,000 rows per query).</p></li>
+<li><p>You can browse the available data online, such as the Census 2011 <a href="https://www.nomisweb.co.uk/census/2011/key_statistics_uk">key statistics</a>.</p></li>
 </ul></li>
 </ol>
 <!-- * Add additional information to the MSOA from the 2011 census, for instance. -->

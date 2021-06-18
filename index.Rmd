@@ -34,23 +34,23 @@ We can combine different sources of social science data, but we can also enrich 
 
 By now, _R_ provides a lot of functionalities for GIS applications and spatial econometrics, and further extensions. So, there are lots of packages not listed here [see e.g. @Bivand.2021]. The most important packages for fundamental spatial operations are:
 
-* Spatial data workhorses: [sf](https://cran.r-project.org/web/packages/sf/index.html) and [stars](https://cran.r-project.org/web/packages/stars/index.html)
+* Spatial data workhorses: [sf](https://cran.r-project.org/web/packages/sf/index.html) [@Pebesma.2018] and [stars](https://cran.r-project.org/web/packages/stars/index.html) [@Pebesma.2021]
 
-* Visualization: [mapview](https://cran.r-project.org/web/packages/mapview/index.html) and [tmap](https://cran.r-project.org/web/packages/tmap/index.html)
+* Visualization: [mapview](https://cran.r-project.org/web/packages/mapview/index.html) [@Appelhans.2021] and [tmap](https://cran.r-project.org/web/packages/tmap/index.html) [@Tennekes.2018]
 
-* Spatial weights and other relations: [sdep](https://cran.r-project.org/web/packages/stars/index.html)
+* Spatial weights and other relations: [spdep](https://cran.r-project.org/web/packages/stars/index.html) [@Bivand.2018]
 
-* Spatial interpolation and kriging: [gstat](https://cran.r-project.org/web/packages/gstat/index.html)
+* Spatial interpolation and kriging: [gstat](https://cran.r-project.org/web/packages/gstat/index.html) [@Graler.2016]
 
-* Spatial regression models: [spatialreg](https://cran.r-project.org/web/packages/spatialreg/index.html)
+* Spatial regression models: [spatialreg](https://cran.r-project.org/web/packages/spatialreg/index.html) [@Bivand.2015.0] and [sphet](https://cran.r-project.org/web/packages/sphet/index.html) [@Bivand.2015.0]
 
 # Further materials
 
 Readings
 
-* Great up-to-date introduction to spatial R: @Lovelace.2019, [freely available online](https://geocompr.robinlovelace.net/)
+* Great up-to-date introduction to spatial R: @Lovelace.2019, [updated version available online](https://geocompr.robinlovelace.net/)
 
-* Another great introduction, but __not up-to-date__: @Bivand.2013.0. However, Edzer Pebesma and Roger Bivand are working on a [new book on Spatial Data Science](https://www.r-spatial.org/book)
+* Another great introduction, but __not up-to-date__: @Bivand.2013.0. However, Edzer Pebesma and Roger Bivand are working on a new book on [Spatial Data Science](https://www.r-spatial.org/book)
 
 * Comprehensive introduction to spatial econometrics: @LeSage.2009.0
 

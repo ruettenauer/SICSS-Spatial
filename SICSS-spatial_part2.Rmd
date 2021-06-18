@@ -26,7 +26,7 @@ link-citations: yes
 ### Required packages
 
 ```{r, message = FALSE, warning = FALSE, results = 'hide'}
-pkgs <- c("sf", "mapview", "spdep", "spatialreg", "tmap", "viridisLite") # note: load spdep first, then spatialreg
+pkgs <- c("sf", "mapview", "spdep", "spatialreg", "tmap", "GWmodel", "viridisLite") # note: load spdep first, then spatialreg
 lapply(pkgs, require, character.only = TRUE)
 
 ```
@@ -207,6 +207,12 @@ summary(idw.lw)
 
 ```
 
+### Islands / missings
+
+In practice, we often have a problem with islands. If we use contiguity based or distance based nieghbours definitions, some units may end up with empty neighbours sets: they just do not touch any other unit or have a neighbour within a specific ditance. This hower creates a problem: what is the value in the neighbouring units?
+
+The `zero.policy` option in spdep allows us to proceed with empty neihbours sets. However, many further functions may run into problems with empty neighbours sets. So it often makes sense to either drop islands, to choose weights which always have neighbours (e.g. k nearest), or impute empty neighbours sets by using the nearest neighbours.
+
 # Spatial Autocorrelation
 
 If spatially close observations are more likely to exhibit similar values, we cannot handle observations as if they were independent.
@@ -347,16 +353,22 @@ Note that all of these models assume different data generating processes (DGP) l
 
 Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies [@HalleckVega.2015.0; @Ruttenauer.2019c; @Wimpy.2021] highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.
 
+#### A note on missings
+
+Missing values create a problem in spatial data analysis. For instance, in a local spillover model with an average of 10 neighbours, one initial missing value will lead to 10 missing values in the spatially lagged variable. For global spillover models, one initial missing will 'flow' through the neighbourhood system until the cutoff point (and create a lo of missings). 
+
+Depending on the data, one can either omit units with missings from the data and the initial neighbours weights creation, or we impute the data first, e.g. using interpolation or kriging.
+
 # Spatial Regression Models: Example
 
 To estimate spatial models, we can currently use `spdep` or `spatialreg`. They contain the same functions, but spatial regression models will be made defunct in `spdep` in future releases, and will only be available in `spatialreg`.
 
 ### SAR
 
-Lets estimate a spatial SAR model using the `lagsarlm()` with contiguity weights. Here we use the median housing values as depended variable. We include population density (`POPDEN`), the percentage of tree cover (`canopy_per`), and the number of pubs (`pubs_count`)
+Lets estimate a spatial SAR model using the `lagsarlm()` with contiguity weights. Here we use the median housing values as depended variable. We include population density (`POPDEN`), the percentage of tree cover (`canopy_per`), and the number of pubs (`pubs_count`) and our traffic estimates (`traffic`)
 
 ```{r}
-hv_1.sar <- lagsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+hv_1.sar <- lagsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + log(traffic),  
                      data = msoa.spdf, 
                      listw = queens.lw,
                      Durbin = FALSE) # we could here extend to SDM
@@ -373,7 +385,7 @@ __NOTE__: interpreting the coefficients or covariates in a SAR model seldomly ma
 SEM models can be estimated using `errorsarlm()`.
 
 ```{r}
-hv_1.sem <- errorsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+hv_1.sem <- errorsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic,  
                      data = msoa.spdf, 
                      listw = queens.lw,
                      Durbin = FALSE) # we could here extend to SDM
@@ -381,14 +393,14 @@ summary(hv_1.sem)
 
 ```
 
-In this case `hv_1.sem$lambda` gives us the spatial parameter. In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model. 
+In this case `hv_1.sem$lambda` gives us the spatial parameter. A highly significant lambda of `r round(hv_1.sem$lambda)` tells us that the errors are highly spatially correlated (e.g. due to correlated unobservables). In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model. 
 
 ### SLX
 
 Above, we could have estimated SDM and SDEM models using the `Durbin` option. To estimate SLX models, we can either use `lmSLX()` directly, or we can create $\bm W \bm X$ manually and use that in any available model fitting function.
 
 ```{r}
-hv_1.slx <- lmSLX(log(Value) ~ log(POPDEN) + canopy_per + pubs_count,  
+hv_1.slx <- lmSLX(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic,  
                   data = msoa.spdf, 
                   listw = queens.lw, 
                   Durbin = TRUE) # use a formula to lag only specific covariates
@@ -396,14 +408,22 @@ summary(hv_1.slx)
 
 ```
 
-In SLX models, we receive the direct effects of covariates as well as the effects of the spatially lagged variables. Here, we can interpret the coefficients directly. For instance, lets look at population density: 1) a high population density in the focal unit is related to lower housing prices, but 2) a high population density in the neighbouring areas in related to higher housing prices (while keeping population density in the focal unit constant). This might indicate that areas with a low population density in central regions of the city (high pop density around) have higher housing prices. We could try testing this interpretation by including the distance to the city centre as a control.
+In SLX models, we receive the direct effects of covariates as well as the effects of the spatially lagged variables. Here, we can interpret the coefficients directly. 
+
+For instance, lets look at population density: 
+
+1. a high population density in the focal unit is related to lower housing prices, but 
+
+2. a high population density in the neighbouring areas in related to higher housing prices (while keeping population density in the focal unit constant). 
+
+This might indicate that areas with a low population density in central regions of the city (high pop density around) have higher housing prices. We could try testing this interpretation by including the distance to the city centre as a control.
 
 Another way of estimating the same model is lagging the covariates first.
 
 ```{r}
 # Loop through vars and create lagged variables
 msoa.spdf$log_POPDEN <- log(msoa.spdf$POPDEN)
-vars <- c("Value", "log_POPDEN", "canopy_per", "pubs_count")
+vars <- c("Value", "log_POPDEN", "canopy_per", "pubs_count", "traffic")
 for(v in vars){
   msoa.spdf[, paste0("w.", v)] <- lag.listw(queens.lw,
                                             var = st_drop_geometry(msoa.spdf)[, v])
@@ -421,8 +441,8 @@ head(w_vars)
 And subsequently we use those new variable in a linear model.
 
 ```{r}
-hv_1.lm <- lm (log(Value) ~ log(POPDEN) + canopy_per + pubs_count +
-                 w.log_POPDEN + w.canopy_per + w.pubs_count,
+hv_1.lm <- lm (log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic +
+                 w.log_POPDEN + w.canopy_per + w.pubs_count + w.traffic,
                data = msoa.spdf)
 summary(hv_1.lm)
 
@@ -443,7 +463,7 @@ Moreover, using the lagged variables gives a high degree of freedom. For instanc
 
 ### Coefficient estimates $\neq$ `marginal' effects
 
-__Attention__: Do not interpret coefficients in SAR, SAC, and SDM!! Using the reduced form 
+__Attention__: Do not interpret coefficients as marginal effects in SAR, SAC, and SDM!! Using the reduced form 
 
 $$	
 	\begin{equation}
@@ -467,7 +487,7 @@ $$
 	where $\rho{\bm W}\beta_k$ equals the effect stemming from direct neighbours, $\rho^2{\bm W}^2\beta_k$ the effect stemming from second order neighbours (neighbours of neighbours),... This also includes feedback loops if unit $i$ is also a second order neighbour of itself.
 
 
-### Impacts
+# Impacts
 
 Note that the derivatives consist of a matrix, returning individual effects for each unit on each other unit, differentiated in _direct, indirect, and total impacts_. However, the individual effects (how $i$ influences $j$) mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
 
@@ -505,6 +525,69 @@ For SLX models, nothing is gained from computing the impacts
 
 ```{r}
 print(impacts(hv_1.slx, listw = queens.lw))
+
+```
+
+# Geographically weighted regression
+
+Obviously there is another interesting questions when using spatial data: Do results vary depending on the region we are looking at. So, we want to exploit the spatial heterogeneity in relation between $y$ and $x$.
+
+GWR [@Brunsdon.1996; @Gollini.2015] is mainly an explorative tool for spatial data analysis in which we estimate an equation at different geographical points. For $L$ given locations across London, we thus receive $L$ different coefficients.
+
+$$
+\begin{align} 
+\hat{\bm \beta}_l=& ({\bm X}^\intercal{\bm M}_l{\bm X})^{-1}{\bm X}^\intercal{\bm M}_l{\bm Y},
+\end{align}
+$$
+
+The $N \times N$ matrix ${\bm M}_l$ defines the weights at each local point $l$, assigning higher weights to closer units. For these local weights, we can use various kernel density functions with a predetermined bandwidth $b$ around each point (either a fixed bandwidth or k nearest neighbours). Here, we use `gwr.robust()` of the `GWmodel` package.
+
+```{r}
+# Search for the optimal bandwidth 
+set.seed(123)
+hv_1.bw <- bw.gwr(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic,
+                  data = as_Spatial(msoa.spdf),
+                  kernel = "boxcar",
+                  adaptive = TRUE) 
+hv_1.bw
+
+
+### GWR 
+hv_1.gwr <- gwr.robust(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic,
+                      data = as_Spatial(msoa.spdf), 
+                      kernel = "boxcar", 
+                      adaptive = TRUE, 
+                      bw = hv_1.bw, 
+                      longlat = FALSE)
+print(hv_1.gwr)
+```
+
+The results give a range of coefficients for different locations. Obviously, we can again map those individual coefficients.
+
+```{r}
+# Spatial object
+gwr.spdf <- st_as_sf(hv_1.gwr$SDF)
+gwr.spdf <- st_make_valid(gwr.spdf)
+
+# Map
+tmap_mode("view")
+
+mp2 <- tm_shape(gwr.spdf) +
+  tm_fill(col = "canopy_per", 
+          style = "hclust", n = 8,
+          title = "Coefficient", 
+          palette = inferno(n = 8, direction = 1),
+          legend.hist = TRUE,
+          alpha = 0.6) +
+  tm_borders(col = "black", lwd = 1) +
+  tm_layout(legend.frame = TRUE, legend.bg.color = TRUE,
+            #legend.position = c("right", "bottom"),
+            legend.outside = TRUE,
+            main.title = "Effect of tree cover", 
+            main.title.position = "center",
+            title.snap.to.legend = TRUE) 
+
+mp2 
 
 ```
 
