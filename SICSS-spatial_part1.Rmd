@@ -413,7 +413,7 @@ The example above is a little bit tricky, given that traffic does not follow a r
 
 Alternatively, we can use integrated nested Laplace approximation with [R-INLA](https://becarioprecario.bitbucket.io/inla-gitbook/index.html) [@GomezRubio.2020].
 
-However, lets add the predictions to our original msoa data using the `intersection()` operation as above.
+However, lets add the predictions to our original msoa data using the `st_intersection()` operation as above.
 
 
 ```{r}

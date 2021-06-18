@@ -352,6 +352,7 @@ div.tocify {
 <ul>
 <li>You could either find the coordinates manually or you use <code>tmaptools</code> function <code>geocode_OSM()</code> using OpenStreetMaps. There are also Google Maps APIs like <code>ggmap</code> or <code>mapsapi</code> but they require registration.</li>
 </ul></li>
+<li><p>How could we improve the interpolation of traffic counts based on <code>idw()</code>?</p></li>
 <li><p>Do results of our spatial models change if we use 10 nearest neighbours for the weights instead of Queens neighbours?</p></li>
 <li><p>Can you think of a way of testing if higher order neighbours add additional information to the SLX regression model?</p>
 <ul>
@@ -362,15 +363,15 @@ div.tocify {
 <div id="more-exercises" class="section level1">
 <h1>More exercises</h1>
 <p>In case you are interested in geo-spatial data analysis, try the following. Note that this might be a bit more tricky and may require some time.</p>
-<ol start="4" style="list-style-type: decimal">
-<li><p>Add the amount of particulate matter (PM10, e.g. 2017) from <a href="https://uk-air.defra.gov.uk/data/pcm-data">Defra</a> and check if pollution influences the housing prices.</p>
+<ol start="5" style="list-style-type: decimal">
+<li><p>Add the amount of particulate matter (PM10, e.g. 2017) from <a href="https://uk-air.defra.gov.uk/data/pcm-data">Defra</a> and check if pollution influences the house values</p>
 <ul>
 <li><p>Note the following important sentence: “The coordinate system is OSGB and the coordinates represent the centre of each 1x1km cell.”</p></li>
 <li><p><code>st_buffer()</code> with the options <code>nQuadSegs  = 1, endCapStyle = 'SQUARE'</code> provides an easy way to get points into grids</p></li>
 </ul></li>
 <li><p>Add some more demographic variables from the Census 2011.</p>
 <ul>
-<li><p>The <code>nomisr</code> package provides an API to nomis. See the <a href="https://cran.r-project.org/web/packages/nomisr/vignettes/introduction.html">Vignette</a>. Make sure to restrict you request to London only (Guest users are limited to 25,000 rows per query).</p></li>
+<li><p>The <code>nomisr</code> package provides an API to nomis. See the <a href="https://cran.r-project.org/web/packages/nomisr/vignettes/introduction.html">Vignette</a>. Make sure to restrict your request to London only (Guest users are limited to 25,000 rows per query).</p></li>
 <li><p>You can browse the available data online, such as the Census 2011 <a href="https://www.nomisweb.co.uk/census/2011/key_statistics_uk">key statistics</a>.</p></li>
 </ul></li>
 </ol>

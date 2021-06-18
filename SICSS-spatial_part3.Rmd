@@ -25,9 +25,11 @@ See below three practical exercises. Please choose the one you are most interest
 
     * You could either find the coordinates manually or you use `tmaptools` function `geocode_OSM()` using OpenStreetMaps. There are also Google Maps APIs like `ggmap` or `mapsapi` but they require registration.
     
-2. Do results of our spatial models change if we use 10 nearest neighbours for the weights instead of Queens neighbours?
+2. How could we improve the interpolation of traffic counts based on `idw()`? 
+    
+3. Do results of our spatial models change if we use 10 nearest neighbours for the weights instead of Queens neighbours?
 
-3. Can you think of a way of testing if higher order neighbours add additional information to the SLX regression model? 
+4. Can you think of a way of testing if higher order neighbours add additional information to the SLX regression model? 
 
     * The function `nblag()` is helpful.
     
@@ -35,15 +37,15 @@ See below three practical exercises. Please choose the one you are most interest
 
 In case you are interested in geo-spatial data analysis, try the following. Note that this might be a bit more tricky and may require some time.
 
-4. Add the amount of particulate matter (PM10, e.g. 2017) from [Defra](https://uk-air.defra.gov.uk/data/pcm-data) and check if pollution influences the housing prices. 
+5. Add the amount of particulate matter (PM10, e.g. 2017) from [Defra](https://uk-air.defra.gov.uk/data/pcm-data) and check if pollution influences the house values 
 
     * Note the following important sentence: "The coordinate system is OSGB and the coordinates represent the centre of each 1x1km cell".
 
     * `st_buffer()` with the options `nQuadSegs  = 1, endCapStyle = 'SQUARE'` provides an easy way to get points into grids
     
-5. Add some more demographic variables from the Census 2011.
+6. Add some more demographic variables from the Census 2011.
 
-    * The `nomisr` package provides an API to nomis. See the [Vignette](https://cran.r-project.org/web/packages/nomisr/vignettes/introduction.html). Make sure to restrict you request to London only (Guest users are limited to 25,000 rows per query).
+    * The `nomisr` package provides an API to nomis. See the [Vignette](https://cran.r-project.org/web/packages/nomisr/vignettes/introduction.html). Make sure to restrict your request to London only (Guest users are limited to 25,000 rows per query).
     
     * You can browse the available data online, such as the Census 2011 [key statistics](https://www.nomisweb.co.uk/census/2011/key_statistics_uk).
 
