@@ -19,9 +19,15 @@ link-citations: yes
 
 # Introduction
 
-This course material is designed for the Summer Institute in Computational Social Science (SICSS) Oxford. The material provides a short introduction into the use of geographical information to connect and analyze different spatial data sources. This course provides a brief and dense introduction to the fundamentals of using geographical information in _R_. This field has developed very quickly over the past few years, and _R_ now provides a rich set of packages for various spatial data operations. For a more in-depth introduction into spatial data analysis in _R_, have a look into the materials references below. 
+This course material is designed for the Summer Institute in Computational Social Science (SICSS) Oxford. 
 
-Why is spatial data linkage and analysis part of SICSS? The amount of spatial ('readymade') data sources is steadily increasing. For instance, the UK open data portal provides many indactors on a spatially agrregated level: https://data.gov.uk/. Moreover, geographical information is increasingly available for traditional ('custommade') data sources, such as survey data. Using geographic information allows us to:
+The material introduces the use of geographical information to connect and analyze different spatial data sources. This introduction is limited to the fundamentals of using geographical information in _R_. The field has develops very fast over since few years, and _R_ now provides a rich set of packages for various spatial data operations. For a more in-depth introduction into spatial data analysis in _R_, have a look into the materials references below. 
+
+Instead of using exemplary data shipped with the packages, the course relies on real world data sources from the [London Datastore](https://data.london.gov.uk/dataset).
+
+### Why is spatial data linkage and analysis part of SICSS? 
+
+The amount of spatial ('readymade') data sources is steadily increasing. For instance, the UK open data portal provides many indactors on a spatially agrregated level: https://data.gov.uk/. Moreover, geographical information is increasingly available for traditional ('custommade') data sources, such as survey data. Using geographic information allows us to:
 
 * Link information from different (unrelated) data sources
 
@@ -77,7 +83,7 @@ Readings
 
 * Comprehensive introduction to spatial econometrics: @LeSage.2009.0
 
-* Two short introductions to spatial econometrics: @HalleckVega.2015.0 and @Ruttenauer.2019c
+* Article-length introductions to spatial econometrics: @HalleckVega.2015.0, @LeSage.2014.0, and @Ruttenauer.2019c
 
 Course materials
 

@@ -50,9 +50,9 @@ load("_data/msoa_spatial.RData")
 
 # Spatial interdependence
 
-We can not only use coordinates and geo-spatial information to connect different data sources, we can also explicitly model spatial (inter)depence in the analysis of our data. In many instance, accounting for spatial dependence might even be necessary to avoid biased point estimates and standard errors. The reason is our observations are often not independent and identically distributed: 'everything is related to everything else, but near things are more related than distant things' [@Tobler.1970.0].
+We can not only use coordinates and geo-spatial information to connect different data sources, we can also explicitly model spatial (inter)depence in the analysis of our data. In many instance, accounting for spatial dependence might even be necessary to avoid biased point estimates and standard errors, as observations are often not independent and identically distributed. 'Everything is related to everything else, but near things are more related than distant things' [@Tobler.1970.0].
 
-However, even if we would receive unbiased estimates with conventional methods, using the spatial information inherent in the data can help us detect specific patterns and spatial relations. 
+However, even if we would receive unbiased estimates with conventional methods, using the spatial information of the data can help us detect specific patterns and spatial relations. 
 
 ## ${\bm W}$: Connectivity between units
 
@@ -71,6 +71,8 @@ $$
     		\end{bmatrix}
 		\end{equation}
 $$
+The spatial weights matrix $\bm W$ is an $N \times N$ dimensional matrix with elements $w_{ij}$ specifying the relation or connectivity between each pair of units $i$ and $j$.
+
 Note: The diagonal elements $w_{i,i}= w_{1,1}, w_{2,2}, \dots, w_{n,n}$  of $\bm W$	are always zero. No unit is a neighbour of itself.
 
 ### Contiguity weights
@@ -97,7 +99,7 @@ $$
 
 * Problem of `island' (units without neighbours)
 
-Lets create a contiguity weights matrix (Queens neighbours) for the London MSOAs. Therefore, we create a neighbours list (`nb`), which is an efficient way of storing ${\bm W}$.
+Lets create a contiguity weights matrix (Queens neighbours) for the London MSOAs: we create a neighbours list (`nb`) using `poly2nb()`, which is an efficient way of storing ${\bm W}$.
 
 ```{r}
 # Contiguity (Queens) neighbours weights
@@ -111,7 +113,7 @@ plot(st_geometry(msoa.spdf), border = "grey60")
 plot(queens.nb, st_centroid(st_geometry(msoa.spdf)), 
      add = TRUE, pch = 19, cex = 0.6)
 
-# We can also transform this into the matrix
+# We can also transform this into a matrix W
 W <- nb2mat(queens.nb, style = "B")
 print(W[1:10, 1:10])
 
@@ -122,14 +124,14 @@ print(W[1:10, 1:10])
 
 Another common type uses the distance $d_{ij}$ between each unit $i$ and $j$.
 
-* Inverse distance weights $w_{i,j} =  \frac{1}{d_{ij}}$
+* Inverse distance weights $w_{i,j} =  \frac{1}{d_{ij}^\alpha}$, where $\alpha$ define the strength of the spatial decay.
 
 $$
 		\begin{equation} 
 		\bm W = \begin{bmatrix} 
-    		0 & \frac{1}{d_{ij}} & \frac{1}{d_{ij}}  \\
-    		\frac{1}{d_{ij}} & 0 & \frac{1}{d_{ij}}  \\
-    		\frac{1}{d_{ij}} & \frac{1}{d_{ij}} & 0  
+    		0 & \frac{1}{d_{ij}^\alpha} & \frac{1}{d_{ij}^\alpha}  \\
+    		\frac{1}{d_{ij}^\alpha} & 0 & \frac{1}{d_{ij}^\alpha}  \\
+    		\frac{1}{d_{ij}^\alpha} & \frac{1}{d_{ij}^\alpha} & 0  
     		\end{bmatrix} 	\nonumber
 		\end{equation}
 $$		
@@ -144,7 +146,7 @@ For now, we will just specify a neighbours list with a distance threshold of 3km
 # Crease centroids
 coords <- st_geometry(st_centroid(msoa.spdf))
 
-# Neighbours within 5km distance
+# Neighbours within 3km distance
 dist_3.nb <- dnearneigh(coords, d1 = 0, d2 = 3000)
 summary(dist_3.nb)
 
@@ -169,7 +171,7 @@ $$
 \frac{w_{ij}}{\sum_j^n w_{ij}}
 $$ 
 		
-* Spatial lags are average values of neighbours
+* With contiguity weights, spatial lags contain average value of neighbours
 
 * Proportions between units (distance based) get lost
 
@@ -186,7 +188,7 @@ summary(queens.lw)
 	
 ### Maximum eigenvalues normalization
 
-Maximum eigenvalues normalization: Divide each non-zero weight by overall maximum eigenvalue $\lambda_{max}$. Each element of $\bm W$ is divided by the same scalar parameter. 
+Maximum eigenvalues normalization divides each non-zero weight by the overall maximum eigenvalue $\lambda_{max}$. Each element of $\bm W$ is divided by the same scalar parameter. 
 		 
 $$
 \frac{\bm W}{\lambda_{max}}
@@ -196,7 +198,7 @@ $$
 
 * Keeps proportions of connectivity strengths across units (relevant esp. for distance based $\bm W$)
 
-For instance, we can use eigenvalue normalization for the inverse distance neighbours. We use `nb2listwdist()` to create weight by inverse distance and normalize in one step.
+We use eigenvalue normalization for the inverse distance neighbours. We use `nb2listwdist()` to create weight inverse distance based weights and normalize in one step.
 
 ```{r}
 idw.lw <- nb2listwdist(dist_3.nb,
@@ -210,9 +212,9 @@ summary(idw.lw)
 
 ### Islands / missings
 
-In practice, we often have a problem with islands. If we use contiguity based or distance based nieghbours definitions, some units may end up with empty neighbours sets: they just do not touch any other unit or have a neighbour within a specific ditance. This hower creates a problem: what is the value in the neighbouring units?
+In practice, we often have a problem with islands. If we use contiguity based or distance based neighbour definitions, some units may end up with empty neighbours sets: they just do not touch any other unit and do not have a neighbour within a specific distance. This however creates a problem: what is the value in the neighbouring units?
 
-The `zero.policy` option in spdep allows us to proceed with empty neihbours sets. However, many further functions may run into problems with empty neighbours sets. So it often makes sense to either drop islands, to choose weights which always have neighbours (e.g. k nearest), or impute empty neighbours sets by using the nearest neighbours.
+The `zero.policy` option in `spdep` allows to proceed with empty neighbours sets. However, many further functions may run into problems and return errors. It often makes sense to either drop islands, to choose weights which always have neighbours (e.g. k nearest), or impute empty neighbours sets by using the nearest neighbours.
 
 # Spatial Autocorrelation
 
@@ -244,7 +246,7 @@ mp1 <- tm_shape(msoa.spdf) +
   tm_layout(legend.frame = TRUE, legend.bg.color = TRUE,
             #legend.position = c("right", "bottom"),
             legend.outside = TRUE,
-            main.title = "Housing values 2017", 
+            main.title = "House values 2017", 
             main.title.position = "center",
             title.snap.to.legend = TRUE) 
 
@@ -282,7 +284,7 @@ moran.test(msoa.spdf$Value, listw = idw.lw, alternative = "two.sided")
 
 # Spatial Regression Models
 
-There are a bunch of different techniques to model spatial dependence and spatial processes [@LeSage.2009.0]. Here, we will just cover a few of the most common techniques / econometric models. One advantage of the most basic spatial model (SLX) is that this method can easily be incorporated in a variety of other methodologies, such as machine learning approaches. @HalleckVega.2015.0, LeSage.2014.0, and @Ruttenauer.2019c provide article-length introductions.
+There are various techniques to model spatial dependence and spatial processes [@LeSage.2009.0]. Here, we will just cover a few of the most common techniques / econometric models. One advantage of the most basic spatial model (SLX) is that this method can easily be incorporated in a variety of other methodologies, such as machine learning approaches. @HalleckVega.2015.0, @LeSage.2014.0, and @Ruttenauer.2019c provide article-length introductions.
 
 There are three basic ways of incorporating spatial dependece.
 
@@ -350,23 +352,23 @@ $$
 		\end{equation}
 $$
 
-Note that all of these models assume different data generating processes (DGP) leading to the spatial correlation or pattern we observe in the data. Although there are specifications tests, it is generally not possible to let the data decide which one is the true underlying DGP [@Cook.2015.563; @Ruttenauer.2019c]. However, there might be theoretical reasons to guide the model specification [@Cook.2015.563]. 
+Note that all of these models assume different data generating processes (DGP) leading to the spatial pattern. Although there are specifications tests, it is generally not possible to let the data decide which one is the true underlying DGP [@Cook.2015.563; @Ruttenauer.2019c]. However, there might be theoretical reasons to guide the model specification [@Cook.2015.563]. 
 
-Just because SAR is probably the model most commonly used does not mean it is the best choice or the most robust alternative. In contrast, various studies [@HalleckVega.2015.0; @Ruttenauer.2019c; @Wimpy.2021] highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.
+Just because SAR is probably the most commonly used model does not make it the best choice. In contrast, various studies [@HalleckVega.2015.0; @Ruttenauer.2019c; @Wimpy.2021] highlight the advantages of the relative simple SLX model. Moreover, this specification can basically be incorporated in any other statistical method.
 
-#### A note on missings
+### A note on missings
 
-Missing values create a problem in spatial data analysis. For instance, in a local spillover model with an average of 10 neighbours, one initial missing value will lead to 10 missing values in the spatially lagged variable. For global spillover models, one initial missing will 'flow' through the neighbourhood system until the cutoff point (and create a lo of missings). 
+Missing values create a problem in spatial data analysis. For instance, in a local spillover model with an average of 10 neighbours, two initial missing values will lead to 20 missing values in the spatially lagged variable. For global spillover models, one initial missing will 'flow' through the neighbourhood system until the cutoff point (and create an excess amount of missings). 
 
-Depending on the data, one can either omit units with missings from the data and the initial neighbours weights creation, or we impute the data first, e.g. using interpolation or kriging.
+Depending on the data, units with missings can either be dropped and omitted from the initial weights creation, or we need to impute the data first, e.g. using interpolation or Kriging.
 
 # Spatial Regression Models: Example
 
-To estimate spatial models, we can currently use `spdep` or `spatialreg`. They contain the same functions, but spatial regression models will be made defunct in `spdep` in future releases, and will only be available in `spatialreg`.
+We can estimate spatial models using `spdep` or `spatialreg`. Both packages contain the same functions, but spatial regression models will be made defunct in `spdep` in future releases, and will only be available in `spatialreg`.
 
 ### SAR
 
-Lets estimate a spatial SAR model using the `lagsarlm()` with contiguity weights. Here we use the median housing values as depended variable. We include population density (`POPDEN`), the percentage of tree cover (`canopy_per`), and the number of pubs (`pubs_count`) and our traffic estimates (`traffic`)
+Lets estimate a spatial SAR model using the `lagsarlm()` with contiguity weights. We use median house value as depended variable, and include population density (`POPDEN`), the percentage of tree cover (`canopy_per`), and the number of pubs (`pubs_count`) and our traffic estimates (`traffic`)
 
 ```{r}
 hv_1.sar <- lagsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + log(traffic),  
@@ -377,9 +379,9 @@ summary(hv_1.sar)
 
 ```
 
-This looks pretty much like a conventional model output, with some additional information: a highly significant `hv_1.sar$rho` of `r round(hv_1.sar$rho, 2)` indicates strong positive spatial autocorrelation. In substantive terms, housing prices in the focal unit positively influence housing prices in neighbouring units, which again influences housing prices among the neighbours of these neighbours, and so on.
+This looks pretty much like a conventional model output, with some additional information: a highly significant `hv_1.sar$rho` of `r round(hv_1.sar$rho, 2)` indicates strong positive spatial autocorrelation. In substantive terms, house prices in the focal unit positively influence house prices in neighbouring units, which again influences house prices among the neighbours of these neighbours, and so on.
 
-__NOTE__: interpreting the coefficients or covariates in a SAR model seldomly makes sense, because of the spillovers and feedback loops in $\bm y$ mentioned above!
+__NOTE__: the coefficients of covariates in a SAR model are not marginal or partical effects, because of the spillovers and feedback loops in $\bm y$ (see below)!
 
 ### SEM
 
@@ -394,11 +396,11 @@ summary(hv_1.sem)
 
 ```
 
-In this case `hv_1.sem$lambda` gives us the spatial parameter. A highly significant lambda of `r round(hv_1.sem$lambda)` tells us that the errors are highly spatially correlated (e.g. due to correlated unobservables). In a spatial error model, we can interpret the coefficients directly, as in a conventional linear model. 
+In this case `hv_1.sem$lambda` gives us the spatial parameter. A highly significant lambda of `r round(hv_1.sem$lambda, 2)` indicates that the errors are highly spatially correlated (e.g. due to correlated unobservables). In spatial error models, we can interpret the coefficients directly, as in a conventional linear model. 
 
 ### SLX
 
-Above, we could have estimated SDM and SDEM models using the `Durbin` option. To estimate SLX models, we can either use `lmSLX()` directly, or we can create $\bm W \bm X$ manually and use that in any available model fitting function.
+Above, we could have estimated SDM and SDEM models using the `Durbin` option. SLX models can either be estimated with `lmSLX()` directly, or by creating $\bm W \bm X$ manually and plugging it into any available model-fitting function.
 
 ```{r}
 hv_1.slx <- lmSLX(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic,  
@@ -409,15 +411,15 @@ summary(hv_1.slx)
 
 ```
 
-In SLX models, we receive the direct effects of covariates as well as the effects of the spatially lagged variables. Here, we can interpret the coefficients directly. 
+In SLX models, we can simply interpret the coefficients of direct and indirect (spatially lagged) covariates. 
 
 For instance, lets look at population density: 
 
-1. a high population density in the focal unit is related to lower housing prices, but 
+1. A high population density in the focal unit is related to lower house prices, but 
 
-2. a high population density in the neighbouring areas in related to higher housing prices (while keeping population density in the focal unit constant). 
+2. A high population density in the neighbouring areas in related to higher house prices (while keeping population density in the focal unit constant). 
 
-This might indicate that areas with a low population density in central regions of the city (high pop density around) have higher housing prices. We could try testing this interpretation by including the distance to the city centre as a control.
+Potential interpretation: areas with a low population density in central regions of the city (high pop density around) have higher house prices. We could try testing this interpretation by including the distance to the city center as a control.
 
 Another way of estimating the same model is lagging the covariates first.
 
@@ -433,13 +435,13 @@ for(v in vars){
 # Alternatively:
 w_vars <- create_WX(st_drop_geometry(msoa.spdf[, vars]),
                     listw = queens.lw,
-                    prefix="w")
+                    prefix = "w")
 
 head(w_vars)
 
 ```
 
-And subsequently we use those new variable in a linear model.
+And subsequently we use those new variables in a linear model.
 
 ```{r}
 hv_1.lm <- lm (log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic +
@@ -455,9 +457,9 @@ Moreover, using the lagged variables gives a high degree of freedom. For instanc
 
 * Use different weights matrices for different variables
 
-* Include higher order neighbours using `nblag()` on the neigbours list (with increasing number of orders we go towards a more global model, but we estimate a coefficient for each spillover, instead of estiamting just one)
+* Include higher order neighbours using `nblag()` (with an increasing number of orders we go towards a more global model, but we estimate a coefficient for each spillover, instead of estimating just one)
 
-* Use machine learning techniques to determine the best fitting weights specification
+* Use machine learning techniques to determine the best fitting weights specification.
 
 
 # Impacts
@@ -490,7 +492,7 @@ $$
 
 # Impacts
 
-Note that the derivatives consist of a matrix, returning individual effects for each unit on each other unit, differentiated in _direct, indirect, and total impacts_. However, the individual effects (how $i$ influences $j$) mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
+Note that the derivative in SAR, SAC, and SDM is a $N \times N$ matrix, returning individual effects of each unit on each other unit, differentiated in _direct, indirect, and total impacts_. However, the individual effects (how $i$ influences $j$) mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
 
 
 Model | Direct Impacts | Indirect Impacts 
@@ -520,9 +522,9 @@ summary(hv_1.sar.imp2, zstats = TRUE, short = TRUE)
 
 ```
 
-The indirect effects here refer to global spillover effects. This means a change of $x$ in the focal units flows through the entire system of neighbours (direct nieightbours, neighbours of neighbours, ...) influencing $y$. One can think of this as diffusion in time or a change in long-term equilibrium.
+The indirect effects in SAR, SAC, and SDM refer to global spillover effects. This means a change of $x$ in the focal units flows through the entire system of neighbours (direct nieightbours, neighbours of neighbours, ...) influencing 'their $y$'. One can think of this as diffusion or a change in a long-term equilibrium.
 
-For SLX models, nothing is gained from computing the impacts
+For SLX models, nothing is gained from computing the impacts.
 
 ```{r}
 print(impacts(hv_1.slx, listw = queens.lw))
@@ -531,9 +533,9 @@ print(impacts(hv_1.slx, listw = queens.lw))
 
 # Geographically weighted regression
 
-Obviously there is another interesting questions when using spatial data: Do results vary depending on the region we are looking at. So, we want to exploit the spatial heterogeneity in relation between $y$ and $x$.
+Does the relation between $y$ and $x$ vary depending on the region we are looking at? With geographically weighted regressions (GWR), we can exploit the spatial heterogeneity in relations / coefficients.
 
-GWR [@Brunsdon.1996; @Gollini.2015] is mainly an explorative tool for spatial data analysis in which we estimate an equation at different geographical points. For $L$ given locations across London, we thus receive $L$ different coefficients.
+GWR [@Brunsdon.1996; @Gollini.2015] is mainly an explorative tool for spatial data analysis in which we estimate an equation at different geographical points. For $L$ given locations across London, we receive $L$ different coefficients.
 
 $$
 \begin{align} 
@@ -541,7 +543,7 @@ $$
 \end{align}
 $$
 
-The $N \times N$ matrix ${\bm M}_l$ defines the weights at each local point $l$, assigning higher weights to closer units. For these local weights, we can use various kernel density functions with a predetermined bandwidth $b$ around each point (either a fixed bandwidth or k nearest neighbours). Here, we use `gwr.robust()` of the `GWmodel` package.
+The $N \times N$ matrix ${\bm M}_l$ defines the weights at each local point $l$, assigning higher weights to closer units. The local weights are determined by a kernel density function with a pre-determined bandwidth $b$ around each point (either a fixed distance or an adaptive k nearest neighbours bandwidth). Models are estimated via `gwr.basic()` or `gwr.robust()` of the `GWmodel` package.
 
 ```{r}
 # Search for the optimal bandwidth 
@@ -563,7 +565,7 @@ hv_1.gwr <- gwr.robust(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traf
 print(hv_1.gwr)
 ```
 
-The results give a range of coefficients for different locations. Obviously, we can again map those individual coefficients.
+The results give a range of coefficients for different locations. Let's map those individual coefficients.
 
 ```{r}
 # Spatial object
@@ -578,13 +580,12 @@ mp2 <- tm_shape(gwr.spdf) +
           style = "hclust", n = 8,
           title = "Coefficient", 
           palette = inferno(n = 8, direction = 1),
-          legend.hist = TRUE,
-          alpha = 0.6) +
+          legend.hist = TRUE) +
   tm_borders(col = "black", lwd = 1) +
   tm_layout(legend.frame = TRUE, legend.bg.color = TRUE,
             #legend.position = c("right", "bottom"),
             legend.outside = TRUE,
-            main.title = "Effect of tree cover", 
+            main.title = "Coefficient of tree cover", 
             main.title.position = "center",
             title.snap.to.legend = TRUE) 
 
