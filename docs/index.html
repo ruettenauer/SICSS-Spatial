@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Tobias Rüttenauer" />
+
+<meta name="date" content="2021-06-19" />
+
+<title>SICSS Oxford - Introduction to geospatial data and analysis</title>
+
+<script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">SICSS Oxford - Spatial</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="SICSS-spatial_part1.html">Part 1: Using and linking spatial data</a>
+</li>
+<li>
+  <a href="SICSS-spatial_part2.html">Part 2: Analysing spatial data</a>
+</li>
+<li>
+  <a href="SICSS-spatial_part3.html">Practical exercises</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">SICSS Oxford - Introduction to geospatial data and analysis</h1>
+<h4 class="author">Tobias Rüttenauer</h4>
+<h4 class="date">June 19, 2021</h4>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This course material is designed for the Summer Institute in Computational Social Science (SICSS) Oxford. The material provides a short introduction into the use of geographical information to connect and analyze different spatial data sources. This course provides a brief and dense introduction to the fundamentals of using geographical information in <em>R</em>. This field has developed very quickly over the past few years, and <em>R</em> now provides a rich set of packages for various spatial data operations. For a more in-depth introduction into spatial data analysis in <em>R</em>, have a look into the materials references below.</p>
+<p>Why is spatial data linkage and analysis part of SICSS? The amount of spatial (‘readymade’) data sources is steadily increasing. For instance, the UK open data portal provides many indactors on a spatially agrregated level: <a href="https://data.gov.uk/" class="uri">https://data.gov.uk/</a>. Moreover, geographical information is increasingly available for traditional (‘custommade’) data sources, such as survey data. Using geographic information allows us to:</p>
+<ul>
+<li><p>Link information from different (unrelated) data sources</p></li>
+<li><p>Incorporate a spatial dimension into the analysis</p></li>
+</ul>
+<p>We can combine different sources of social science data, but we can also enrich existing social science data with information on aggregated demographics or other contextual information.</p>
+<div class="figure">
+<img src="fig/fig1_Juenger.jpg" alt="" />
+<p class="caption">Figure: Spatial data linkage, Source: <span class="citation"><a href="#ref-Junger.2019" role="doc-biblioref">Jünger</a> (<a href="#ref-Junger.2019" role="doc-biblioref">2019</a>)</span></p>
+</div>
+</div>
+<div id="some-examples" class="section level1">
+<h1>Some examples</h1>
+<div id="evolution-and-epidemic-spread-of-sars-cov-2-in-brazil-candido.2020" class="section level3">
+<h3>Evolution and epidemic spread of SARS-CoV-2 in Brazil <span class="citation">(<a href="#ref-Candido.2020" role="doc-biblioref">Candido et al. 2020</a>)</span></h3>
+<p><img src="fig/Pereira.jpg" /></p>
+</div>
+<div id="urban-scaling-and-the-regional-divide-keuschnigg.2019" class="section level3">
+<h3>Urban Scaling and the Regional Divide <span class="citation">(<a href="#ref-Keuschnigg.2019" role="doc-biblioref">Keuschnigg, Mutgan, and Hedström 2019</a>)</span></h3>
+<p><img src="fig/Keuschnigg.jpg" /></p>
+</div>
+<div id="local-candidates-place-based-identities-and-electoral-success-schultecloos.2021" class="section level3">
+<h3>Local candidates, place-based identities, and electoral success <span class="citation">(<a href="#ref-SchulteCloos.2021" role="doc-biblioref">Schulte-Cloos and Bauer 2021</a>)</span></h3>
+<p><img src="fig/Schulte-cloos.jpg" /></p>
+</div>
+<div id="inequality-is-rising-where-social-network-segregation-interacts-with-urban-topology-toth.2021" class="section level3">
+<h3>Inequality is rising where social network segregation interacts with urban topology <span class="citation">(<a href="#ref-Toth.2021" role="doc-biblioref">Tóth et al. 2021</a>)</span></h3>
+<p><img src="fig/Toth.jpg" /></p>
+</div>
+<div id="extreme-weather-events-elevate-climate-change-belief-but-not-pro-environmental-behaviour-ruttenauer.2021c" class="section level3">
+<h3>Extreme Weather Events Elevate Climate Change Belief but not Pro-Environmental Behaviour <span class="citation">(<a href="#ref-Ruttenauer.2021c" role="doc-biblioref">Rüttenauer 2021</a>)</span></h3>
+<p><img src="fig/Ruettenauer.jpg" /></p>
+</div>
+</div>
+<div id="some-useful-packages" class="section level1">
+<h1>Some useful packages</h1>
+<p>By now, <em>R</em> provides a lot of functionalities for GIS applications and spatial econometrics, and further extensions. There are lots of packages providing a huge variety of spatial functionalities and methods <span class="citation">(see e.g. <a href="#ref-Bivand.2021" role="doc-biblioref">Bivand, Millo, and Piras 2021</a>)</span>. Important packages for fundamental spatial operations are:</p>
+<ul>
+<li><p>Spatial data workhorses: <a href="https://cran.r-project.org/web/packages/sf/index.html">sf</a> <span class="citation">(<a href="#ref-Pebesma.2018" role="doc-biblioref">Pebesma 2018</a>)</span> and <a href="https://cran.r-project.org/web/packages/stars/index.html">stars</a> <span class="citation">(<a href="#ref-Pebesma.2021" role="doc-biblioref">Pebesma 2021</a>)</span></p></li>
+<li><p>Visualization: <a href="https://cran.r-project.org/web/packages/mapview/index.html">mapview</a> <span class="citation">(<a href="#ref-Appelhans.2021" role="doc-biblioref">Appelhans et al. 2021</a>)</span> and <a href="https://cran.r-project.org/web/packages/tmap/index.html">tmap</a> <span class="citation">(<a href="#ref-Tennekes.2018" role="doc-biblioref">Tennekes 2018</a>)</span></p></li>
+<li><p>Spatial weights and other relations: <a href="https://cran.r-project.org/web/packages/stars/index.html">spdep</a> <span class="citation">(<a href="#ref-Bivand.2018" role="doc-biblioref">Bivand and Wong 2018</a>)</span></p></li>
+<li><p>Spatial interpolation and kriging: <a href="https://cran.r-project.org/web/packages/gstat/index.html">gstat</a> <span class="citation">(<a href="#ref-Graler.2016" role="doc-biblioref">Gräler, Pebesma, and Heuvelink 2016</a>)</span></p></li>
+<li><p>Spatial regression models: <a href="https://cran.r-project.org/web/packages/spatialreg/index.html">spatialreg</a> <span class="citation">(<a href="#ref-Bivand.2015.0" role="doc-biblioref">Bivand and Piras 2015</a>)</span> and <a href="https://cran.r-project.org/web/packages/sphet/index.html">sphet</a> <span class="citation">(<a href="#ref-Bivand.2015.0" role="doc-biblioref">Bivand and Piras 2015</a>)</span></p></li>
+</ul>
+</div>
+<div id="further-materials" class="section level1">
+<h1>Further materials</h1>
+<p>Readings</p>
+<ul>
+<li><p>Great up-to-date introduction to spatial R: <span class="citation"><a href="#ref-Lovelace.2019" role="doc-biblioref">Lovelace, Nowosad, and Muenchow</a> (<a href="#ref-Lovelace.2019" role="doc-biblioref">2019</a>)</span>, <a href="https://geocompr.robinlovelace.net/">updated version available online</a></p></li>
+<li><p>Another great introduction, but <strong>not up-to-date</strong>: <span class="citation"><a href="#ref-Bivand.2013.0" role="doc-biblioref">Bivand, Pebesma, and Gómez-Rubio</a> (<a href="#ref-Bivand.2013.0" role="doc-biblioref">2013</a>)</span>. However, Edzer Pebesma and Roger Bivand are working on a new book on <a href="https://www.r-spatial.org/book">Spatial Data Science</a></p></li>
+<li><p>Comprehensive introduction to spatial econometrics: <span class="citation"><a href="#ref-LeSage.2009.0" role="doc-biblioref">LeSage and Pace</a> (<a href="#ref-LeSage.2009.0" role="doc-biblioref">2009</a>)</span></p></li>
+<li><p>Two short introductions to spatial econometrics: <span class="citation"><a href="#ref-HalleckVega.2015.0" role="doc-biblioref">Halleck Vega and Elhorst</a> (<a href="#ref-HalleckVega.2015.0" role="doc-biblioref">2015</a>)</span> and <span class="citation"><a href="#ref-Ruttenauer.2019c" role="doc-biblioref">Rüttenauer</a> (<a href="#ref-Ruttenauer.2019c" role="doc-biblioref">2019</a>)</span></p></li>
+</ul>
+<p>Course materials</p>
+<ul>
+<li>For those looking for a more in-depth introduction, I highly recommend Roger Bivand’s course on Spatial Data Analysis: <a href="https://www.youtube.com/watch?v=KkIbg50Pa0I&amp;list=PLXUoTpMa_9s10NVk4dBQljNOaOXAOhcE0">Youtube recordings</a>, <a href="https://rsbivand.github.io/ECS530_h19/">Course Materials</a></li>
+</ul>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Appelhans.2021" class="csl-entry">
+Appelhans, Tim, Florian Detsch, Chritoph Reudenbach, and Stefan Woellauer. 2021. <span>“<span class="nocase">mapview: Interactive Viewing of Spatial Data in R</span>.”</span> <a href="https://CRAN.R-project.org/package=mapview">https://CRAN.R-project.org/package=mapview</a>.
+</div>
+<div id="ref-Bivand.2021" class="csl-entry">
+Bivand, Roger, Giovanni Millo, and Gianfranco Piras. 2021. <span>“<span class="nocase">A Review of Software for Spatial Econometrics in R</span>.”</span> <em><span>Mathematics</span></em> 9 (11): 1276. <a href="https://doi.org/10.3390/math9111276">https://doi.org/10.3390/math9111276</a>.
+</div>
+<div id="ref-Bivand.2013.0" class="csl-entry">
+Bivand, Roger, Edzer Pebesma, and Virgilio Gómez-Rubio. 2013. <em><span class="nocase">Applied Spatial Data Analysis with R</span></em>. New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-7618-4">https://doi.org/10.1007/978-1-4614-7618-4</a>.
+</div>
+<div id="ref-Bivand.2015.0" class="csl-entry">
+Bivand, Roger, and Gianfranco Piras. 2015. <span>“<span class="nocase">Comparing Implementations of Estimation Methods for Spatial Econometrics</span>.”</span> <em><span>Journal of Statistical Software</span></em> 63 (18): 1–36. <a href="https://doi.org/10.18637/jss.v063.i18">https://doi.org/10.18637/jss.v063.i18</a>.
+</div>
+<div id="ref-Bivand.2018" class="csl-entry">
+Bivand, Roger, and David W. S. Wong. 2018. <span>“<span class="nocase">Comparing implementations of global and local indicators of spatial association</span>.”</span> <em><span>TEST</span></em> 27 (3): 716–48. <a href="https://doi.org/10.1007/s11749-018-0599-x">https://doi.org/10.1007/s11749-018-0599-x</a>.
+</div>
+<div id="ref-Candido.2020" class="csl-entry">
+Candido, Darlan S., Ingra M. Claro, Jaqueline G. de Jesus, William M. Souza, Filipe R. R. Moreira, Simon Dellicour, Thomas A. Mellan, et al. 2020. <span>“<span class="nocase">Evolution and epidemic spread of SARS-CoV-2 in Brazil</span>.”</span> <em><span>Science</span></em> 369 (6508): 1255–60. <a href="https://doi.org/10.1126/science.abd2161">https://doi.org/10.1126/science.abd2161</a>.
+</div>
+<div id="ref-Graler.2016" class="csl-entry">
+Gräler, Benedikt, Edzer Pebesma, and Gerard Heuvelink. 2016. <span>“<span class="nocase">Spatio-Temporal Interpolation using gstat</span>.”</span> <em><span>The R Journal</span></em> 8 (1): 204–18.
+</div>
+<div id="ref-HalleckVega.2015.0" class="csl-entry">
+Halleck Vega, Solmaria, and J. Paul Elhorst. 2015. <span>“<span>The SLX Model</span>.”</span> <em><span>Journal of Regional Science</span></em> 55 (3): 339–63. <a href="https://doi.org/10.1111/jors.12188">https://doi.org/10.1111/jors.12188</a>.
+</div>
+<div id="ref-Junger.2019" class="csl-entry">
+Jünger, Stefan. 2019. <span>“<span class="nocase">Using Georeferenced Data in Social Science Survey Research: The Method of Spatial Linking and Its Application with the German General Social Survey and the GESIS Panel</span>.”</span> PhD thesis, <span>SSOAR - GESIS Leibniz Institute for the Social Sciences</span>. <a href="https://doi.org/10.21241/ssoar.63688">https://doi.org/10.21241/ssoar.63688</a>.
+</div>
+<div id="ref-Keuschnigg.2019" class="csl-entry">
+Keuschnigg, Marc, Selcan Mutgan, and Peter Hedström. 2019. <span>“<span class="nocase">Urban Scaling and the Regional Divide</span>.”</span> <em><span>Science Advances</span></em> 5 (1): eaav0042. <a href="https://doi.org/10.1126/sciadv.aav0042">https://doi.org/10.1126/sciadv.aav0042</a>.
+</div>
+<div id="ref-LeSage.2009.0" class="csl-entry">
+LeSage, James P., and R. Kelley Pace. 2009. <em><span class="nocase">Introduction to Spatial Econometrics</span></em>. <span class="nocase">Statistics, Textbooks and Monographs</span>. Boca Raton: <span>CRC Press</span>.
+</div>
+<div id="ref-Lovelace.2019" class="csl-entry">
+Lovelace, Robin, Jakub Nowosad, and Jannes Muenchow. 2019. <em><span class="nocase">Geocomputation with R</span></em>. 1st ed. <span class="nocase">Chapman <span>&amp;</span> Hall/CRC the R series</span>. Boca Raton: <span>Chapman <span>&amp;</span> Hall/CRC</span>.
+</div>
+<div id="ref-Pebesma.2018" class="csl-entry">
+Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple features for R: Standardized support for spatial vector data</span>.”</span> <em><span>The R Journal</span></em> 10 (1): 439. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.
+</div>
+<div id="ref-Pebesma.2021" class="csl-entry">
+———. 2021. <span>“<span class="nocase">stars: Spatiotemporal Arrays, Raster and Vector Data Cubes. R package version 0.5-3</span>.”</span> <a href="https://CRAN.R-project.org/package=stars">https://CRAN.R-project.org/package=stars</a>.
+</div>
+<div id="ref-Ruttenauer.2019c" class="csl-entry">
+Rüttenauer, Tobias. 2019. <span>“<span class="nocase">Spatial Regression Models: A Systematic Comparison of Different Model Specifications Using Monte Carlo Experiments</span>.”</span> <em><span>Sociological Methods <span>&amp;</span> Research</span></em> OnlineFirst. <a href="https://doi.org/10.1177/0049124119882467">https://doi.org/10.1177/0049124119882467</a>.
+</div>
+<div id="ref-Ruttenauer.2021c" class="csl-entry">
+———. 2021. <span>“<span class="nocase">Extreme Weather Events Elevate Climate Change Belief but not Pro-Environmental Behaviour</span>.”</span> <em><span>SocArXiv</span></em>. <a href="https://doi.org/10.31235/osf.io/574uf">https://doi.org/10.31235/osf.io/574uf</a>.
+</div>
+<div id="ref-SchulteCloos.2021" class="csl-entry">
+Schulte-Cloos, Julia, and Paul C. Bauer. 2021. <span>“<span class="nocase">Local Candidates, Place-Based Identities, and Electoral Success</span>.”</span> <em><span>Political Behavior</span></em> 31 (3): 301. <a href="https://doi.org/10.1007/s11109-021-09712-y">https://doi.org/10.1007/s11109-021-09712-y</a>.
+</div>
+<div id="ref-Tennekes.2018" class="csl-entry">
+Tennekes, Martijn. 2018. <span>“<span class="nocase">tmap : Thematic Maps in R</span>.”</span> <em><span>Journal of Statistical Software</span></em> 84 (6). <a href="https://doi.org/10.18637/jss.v084.i06">https://doi.org/10.18637/jss.v084.i06</a>.
+</div>
+<div id="ref-Toth.2021" class="csl-entry">
+Tóth, Gergő, Johannes Wachs, Riccardo Di Clemente, Ákos Jakobi, Bence Ságvári, János Kertész, and Balázs Lengyel. 2021. <span>“<span class="nocase">Inequality is rising where social network segregation interacts with urban topology</span>.”</span> <em><span>Nature Communications</span></em> 12 (1): 1143. <a href="https://doi.org/10.1038/s41467-021-21465-0">https://doi.org/10.1038/s41467-021-21465-0</a>.
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 title: "Practical exercises"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
+output_dir: "./docs"
 output: 
   html_document:
     theme: flatly

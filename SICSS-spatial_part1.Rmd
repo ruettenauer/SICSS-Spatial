@@ -2,6 +2,7 @@
 title: "Part 1: Using and linking spatial data"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
+output_dir: "./docs"
 output: 
   html_document:
     theme: flatly
@@ -131,28 +132,9 @@ head(msoa.spdf)
 This looks like a conventional `data.frame` but has the additional column `geometry` containing the coordinates of each observation. `st_geometry()` returns only the geographic object and `st_drop_geometry()` only the `data.frame` without the coordinates. We can plot the object using `mapview()`.
 
 ```{r}
-mapview(msoa.spdf[, "POPDEN"])  
+mapview(msoa.spdf[, "POPDEN"])
 
 ```
-
-<!-- And we add income estimates (https://data.london.gov.uk/dataset/ons-model-based-income-estimates--msoa) -->
-
-<!-- ```{r} -->
-
-<!-- # Download excel file (why...??) -->
-<!-- econ.link <- "http://data.london.gov.uk/download/ons-model-based-income-estimates--msoa/ad11a43a-048b-437c-9f7e-116df59eb811/ons-model-based-income-estimates-msoa.xls" -->
-<!-- econ.df <- gdata::read.xls(econ.link, sheet = 2) # this only works with http, not with https -->
-<!-- names(econ.df) <- gsub("\\.\\.+", "", names(econ.df)) -->
-<!-- econ.df[, 7:ncol(econ.df)] <- sapply(econ.df[, 7:ncol(econ.df)],  -->
-<!--                                      FUN = function(x) as.numeric(gsub(",", "", x))) -->
-
-<!-- # Merge (as with conventional df) -->
-<!-- msoa.spdf <- merge(msoa.spdf, econ.df,  -->
-<!--                    by.x = "MSOA11CD", by.y = "MSOA.code",  -->
-<!--                    all.x = TRUE, all.y = FALSE) -->
-
-<!-- mapview(msoa.spdf[, "Total.annual.income"])   -->
-<!-- ``` -->
 
 And we add the median housing prices in 2017 from the [London Datastore](https://data.london.gov.uk/dataset/average-house-prices)
 
@@ -161,7 +143,7 @@ And we add the median housing prices in 2017 from the [London Datastore](https:/
 # Download
 hp.link <- "https://data.london.gov.uk/download/average-house-prices/bdf8eee7-41e1-4d24-90ce-93fe5cf040ae/land-registry-house-prices-MSOA.csv"
 hp.df <- read.csv(hp.link)
-hp.df <- hp.df[which(hp.df$Measure == "Median" & 
+hp.df <- hp.df[which(hp.df$Measure == "Median" &
                        hp.df$Year == "Year ending Sep 2017"), ]
 hp.df$Value <- as.numeric(hp.df$Value)
 
@@ -178,7 +160,7 @@ mapview(msoa.spdf[, "Value"])
 
 ## Tree cover (gridded)
 
-The London Tree Canopy Cover data provides data on tree coverage in London based on high-resolution imagery and machine learning techniques, again available at [London Datastore](https://data.london.gov.uk/dataset/curio-canopy), 
+The London Tree Canopy Cover data provides data on tree coverage in London based on high-resolution imagery and machine learning techniques, again available at [London Datastore](https://data.london.gov.uk/dataset/curio-canopy),
 
 ```{r}
 # Download zip shapefile
@@ -186,11 +168,11 @@ tmpf <- tempfile()
 trees.link <- "https://data.london.gov.uk/download/curio-canopy/4fd54ef7-195f-43dc-a0d1-24e96e876f6c/shp-hexagon-files.zip"
 download.file(trees.link, tmpf)
 unzip(zipfile = tmpf, exdir = paste0(dn))
+unlink(tmpf)
 trees.spdf <- st_read(dsn = paste0(dn, "/shp-hexagon-files"),
                       layer = "gla-canopy-hex")
-unlink(tmpf)
 
-mapview(trees.spdf[, "canopy_per"])  
+mapview(trees.spdf[, "canopy_per"])
 
 ```
 
@@ -210,7 +192,7 @@ st_layers(tmpf)
 pubs.spdf <- st_read(dsn = tmpf, layer = "Pubs")
 unlink(tmpf)
 
-mapview(st_geometry(pubs.spdf)) 
+mapview(st_geometry(pubs.spdf))
 
 ```
 
@@ -220,14 +202,14 @@ mapview(st_geometry(pubs.spdf))
 
 Having data with geo-spatial information allows to perform a variety of methods to manipulate and link different data sources. Commonly used methods include 1) subsetting, 2) point-in-polygon operations, 3) distance measures, 4) intersections or buffer methods.
 
-The [online Vignettes of the sf package](https://r-spatial.github.io/sf/articles/) provide a comprehensive overview of the multiple ways of spatial manipulations. 
+The [online Vignettes of the sf package](https://r-spatial.github.io/sf/articles/) provide a comprehensive overview of the multiple ways of spatial manipulations.
 
 
 #### Check if data is on common projection
 
 ```{r}
 st_crs(msoa.spdf) == st_crs(trees.spdf)
-st_crs(trees.spdf) == st_crs(pubs.spdf) 
+st_crs(trees.spdf) == st_crs(pubs.spdf)
 
 # MSOA in different crs --> transform
 msoa.spdf <- st_transform(msoa.spdf, crs = st_crs(trees.spdf))
@@ -269,13 +251,13 @@ We might be interested in the number of pubs in each MSOA. So we count the numbe
 pubs_msoa.join <- st_join(pubs.spdf, msoa.spdf, join = st_within)
 
 # Count N by MSOA code (drop geometry to speed up)
-pubs_msoa.join <- dplyr::count(st_drop_geometry(pubs_msoa.join), 
+pubs_msoa.join <- dplyr::count(st_drop_geometry(pubs_msoa.join),
                                MSOA11CD = pubs_msoa.join$MSOA11CD,
-                               name = "pubs_count") 
+                               name = "pubs_count")
 sum(pubs_msoa.join$pubs_count)
 
 # Merge and replace NAs with zero (no matches, no pubs)
-msoa.spdf <- merge(msoa.spdf, pubs_msoa.join, 
+msoa.spdf <- merge(msoa.spdf, pubs_msoa.join,
                    by = "MSOA11CD", all.x = TRUE)
 msoa.spdf$pubs_count[is.na(msoa.spdf$pubs_count)] <- 0
 
@@ -296,7 +278,7 @@ mapview(trees_high.spdf[, "canopy_per"])
 cent.sp <- st_centroid(msoa.spdf[, "MSOA11CD"])
 
 # Get K nearest neighbour with distance
-knb.dist <- st_nn(cent.sp, trees_high.spdf, 
+knb.dist <- st_nn(cent.sp, trees_high.spdf,
                   k = 1, returnDist = TRUE,
                   progress = FALSE)
 msoa.spdf$dist_trees50 <- unlist(knb.dist$dist)
@@ -345,17 +327,17 @@ First lets get some point data with associated attributes or measures. In this e
 # Download
 traffic.link <- "https://dft-statistics.s3.amazonaws.com/road-traffic/downloads/aadf/region_id/dft_aadf_region_id_6.csv"
 traffic.df <- read.csv(traffic.link)
-traffic.df <- traffic.df[which(traffic.df$year == 2017 & 
+traffic.df <- traffic.df[which(traffic.df$year == 2017 &
                        traffic.df$road_type == "Major"), ]
 names(traffic.df)
 
 # Transform to spatial data
-traffic.spdf <- st_as_sf(traffic.df, 
-                         coords = c("longitude", "latitude"), 
+traffic.spdf <- st_as_sf(traffic.df,
+                         coords = c("longitude", "latitude"),
                          crs = 4326)
 
 # Transform into common crs
-traffic.spdf <- st_transform(traffic.spdf, 
+traffic.spdf <- st_transform(traffic.spdf,
                              crs = st_crs(msoa.spdf))
 
 # Map
@@ -382,9 +364,9 @@ There are various ways of interpolating. Common methods are nearest neighbours m
 
 ```{r}
 # IDW interpolation
-all_motor.idw <- idw(all_motor_vehicles ~ 1, 
-                     locations = traffic.spdf, 
-                     newdata = grid, 
+all_motor.idw <- idw(all_motor_vehicles ~ 1,
+                     locations = traffic.spdf,
+                     newdata = grid,
                      idp = 2) # power of distance decay
 mapview(all_motor.idw[, "var1.pred"])
 ```
@@ -396,12 +378,12 @@ A more advantage technique is Kriging, which estimates values as a function of a
 
 ```{r}
 # Variogram
-all_motor.var <- variogram(all_motor_vehicles ~ 1, 
+all_motor.var <- variogram(all_motor_vehicles ~ 1,
                           traffic.spdf)
 plot(all_motor.var)
 
 # Fit variogram
-all_motor.varfit <- fit.variogram(all_motor.var, 
+all_motor.varfit <- fit.variogram(all_motor.var,
                                   vgm(c("Nug", "Exp")), # use vgm() to see options
                                   fit.kappa = TRUE, fit.sills = TRUE, fit.ranges = TRUE)
 
@@ -415,7 +397,7 @@ all_motor.varfit
 
 all_motor.kg <- krige(all_motor_vehicles ~ 1,
                       locations = traffic.spdf,
-                      newdata = grid, 
+                      newdata = grid,
                       model = all_motor.varfit)
 
 # Look at results
@@ -423,7 +405,9 @@ mapview(all_motor.kg[, "var1.pred"])
 
 ```
 
-The example above is a little bit tricky, given that traffic does not follow a random process, but (usually) follows the street network. We would probably increase the performance by either adding the street network itself and interpolating along this network, or by adding covariates to our prediction (Universal Kriging). Alternatively, we can use integrated nested Laplace approximation with [R-INLA](https://becarioprecario.bitbucket.io/inla-gitbook/index.html) [@GomezRubio.2020].
+The example above is a little bit tricky, given that traffic does not follow a random process, but (usually) follows the street network. We would probably increase the performance by either adding the street network (e.g. using [osmdata](https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html) OSM Overpass API) and interpolating along this network, or by adding covariates to our prediction (Universal Kriging). If we had origin - destination data, we could use [stplanr](https://cran.r-project.org/web/packages/stplanr/vignettes/stplanr-od.html) for routing along the street network.
+
+Alternatively, we can use integrated nested Laplace approximation with [R-INLA](https://becarioprecario.bitbucket.io/inla-gitbook/index.html) [@GomezRubio.2020].
 
 Lets add the prediction to our original msoa data using the insection operation as above.
 
@@ -446,7 +430,7 @@ msoa.spdf <- merge(msoa.spdf, smoa_grid.int, by = "MSOA11CD", all.x = TRUE)
 
 ```{r}
 # Save
-save(msoa.spdf, file = "msoa_spatial.RData")
+save(msoa.spdf, file = "_data/msoa_spatial.RData")
 
 ```
 

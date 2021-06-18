@@ -2,6 +2,7 @@
 title: "Part 2: Analysing spatial data"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
+output_dir: "./docs"
 output: 
   html_document:
     theme: flatly
@@ -43,7 +44,7 @@ sessionInfo()
 See previous file.
 
 ```{r}
-load("msoa_spatial.RData")
+load("_data/msoa_spatial.RData")
 
 ```
 

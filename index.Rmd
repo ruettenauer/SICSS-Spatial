@@ -2,6 +2,7 @@
 title: "SICSS Oxford - Introduction to geospatial data and analysis"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
+output_dir: "./docs"
 output: 
   html_document:
     theme: flatly
@@ -30,9 +31,31 @@ We can combine different sources of social science data, but we can also enrich 
 
 ![Figure: Spatial data linkage, Source: @Junger.2019](fig/fig1_Juenger.jpg)
 
+# Some examples
+
+### Evolution and epidemic spread of SARS-CoV-2 in Brazil [@Candido.2020]
+
+![](fig/Pereira.jpg)
+
+### Urban Scaling and the Regional Divide [@Keuschnigg.2019]
+
+![](fig/Keuschnigg.jpg)
+
+### Local candidates, place-based identities, and electoral success [@SchulteCloos.2021]
+
+![](fig/Schulte-cloos.jpg)
+
+### Inequality is rising where social network segregation interacts with urban topology [@Toth.2021]
+
+![](fig/Toth.jpg)
+
+### Extreme Weather Events Elevate Climate Change Belief but not Pro-Environmental Behaviour [@Ruttenauer.2021c]
+
+![](fig/Ruettenauer.jpg)
+
 # Some useful packages
 
-By now, _R_ provides a lot of functionalities for GIS applications and spatial econometrics, and further extensions. So, there are lots of packages not listed here [see e.g. @Bivand.2021]. The most important packages for fundamental spatial operations are:
+By now, _R_ provides a lot of functionalities for GIS applications and spatial econometrics, and further extensions. There are lots of packages providing a huge variety of spatial functionalities and methods [see e.g. @Bivand.2021]. Important packages for fundamental spatial operations are:
 
 * Spatial data workhorses: [sf](https://cran.r-project.org/web/packages/sf/index.html) [@Pebesma.2018] and [stars](https://cran.r-project.org/web/packages/stars/index.html) [@Pebesma.2021]
 
