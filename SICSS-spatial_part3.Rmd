@@ -23,7 +23,8 @@ See below three practical exercises. Please choose the one you are most interest
 
 1. Add a control for the distance to Boris' home (10 Downing St, London SW1A 2AB, UK). 
 
-    * You could either find the coordinates manually or you use `tmaptools` function `geocode_OSM()` using OpenStreetMaps. There are also Google Maps APIs like `ggmap` or `mapsapi` but they require registration.
+    * You could either find the coordinates manually or you use `tmaptools` function `geocode_OSM()` using OpenStreetMaps. 
+    * There are also Google Maps APIs like `ggmap` or `mapsapi` but they require registration.
     
 2. How could we improve the interpolation of traffic counts based on `idw()`? 
     
