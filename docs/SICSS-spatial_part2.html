@@ -861,7 +861,7 @@ Moreover, there are models combining two sets of the above specifications.</p>
 <h3>Spatial Durbin Model (SDM)</h3>
 <p><span class="math display">\[
         \begin{equation}
-        {\boldsymbol{\mathbf{y}}}=\alpha{\boldsymbol{\mathbf{\iota}}}+{\boldsymbol{\mathbf{X}}}{\boldsymbol{\mathbf{\beta}}}+{\boldsymbol{\mathbf{W}}}{\boldsymbol{\mathbf{X}}}{\boldsymbol{\mathbf{\theta}}}+ {\boldsymbol{\mathbf{\varepsilon}}}
+        {\boldsymbol{\mathbf{y}}}=\alpha{\boldsymbol{\mathbf{\iota}}}+\rho{\boldsymbol{\mathbf{W}}}{\boldsymbol{\mathbf{y}}}+{\boldsymbol{\mathbf{X}}}{\boldsymbol{\mathbf{\beta}}}+{\boldsymbol{\mathbf{W}}}{\boldsymbol{\mathbf{X}}}{\boldsymbol{\mathbf{\theta}}}+ {\boldsymbol{\mathbf{\varepsilon}}}
         \end{equation}
 \]</span></p>
 </div>
@@ -1161,25 +1161,25 @@ where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> 
 ## Simulation results ( variance matrix):
 ## ========================================================
 ## Simulated standard errors
-##                    Direct    Indirect       Total
-## log(POPDEN)  0.0120382311 0.040237638 0.052149572
-## canopy_per   0.0011964182 0.004312906 0.005391624
-## pubs_count   0.0008492589 0.003231409 0.003990516
-## log(traffic) 0.0273093691 0.088663160 0.115619110
+##                   Direct    Indirect       Total
+## log(POPDEN)  0.012805052 0.043320064 0.056017392
+## canopy_per   0.001215794 0.004524322 0.005643427
+## pubs_count   0.000817781 0.003159482 0.003894526
+## log(traffic) 0.026704604 0.086407854 0.112706803
 ## 
 ## Simulated z-values:
-##                 Direct  Indirect     Total
-## log(POPDEN)  -1.023771 -1.013850 -1.018595
-## canopy_per    4.444814  4.067007  4.239627
-## pubs_count    4.809266  4.179189  4.407697
-## log(traffic) -1.318160 -1.319812 -1.323456
+##                  Direct   Indirect      Total
+## log(POPDEN)  -0.9568198 -0.9389721 -0.9448576
+## canopy_per    4.2754288  3.8303296  3.9918454
+## pubs_count    5.0915577  4.3956172  4.6351342
+## log(traffic) -1.4111853 -1.4331230 -1.4330832
 ## 
 ## Simulated p-values:
 ##              Direct     Indirect   Total     
-## log(POPDEN)  0.30594    0.31065    0.30840   
-## canopy_per   8.7968e-06 4.7621e-05 2.2389e-05
-## pubs_count   1.5149e-06 2.9255e-05 1.0448e-05
-## log(traffic) 0.18745    0.18690    0.18568</code></pre>
+## log(POPDEN)  0.33866    0.34774509 0.34473   
+## canopy_per   1.9077e-05 0.00012797 6.5561e-05
+## pubs_count   3.5513e-07 1.1046e-05 3.5671e-06
+## log(traffic) 0.15819    0.15182268 0.15183</code></pre>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative with traces (better for large W)</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">as</span>(queens.lw, <span class="st">&quot;CsparseMatrix&quot;</span>)</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>trMatc <span class="ot">&lt;-</span> <span class="fu">trW</span>(W, <span class="at">type=</span><span class="st">&quot;mult&quot;</span>)</span>
@@ -1195,25 +1195,25 @@ where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> 
 ## Simulation results ( variance matrix):
 ## ========================================================
 ## Simulated standard errors
-##                    Direct    Indirect      Total
-## log(POPDEN)  0.0146332993 0.050506566 0.06499210
-## canopy_per   0.0012652329 0.004656804 0.00579374
-## pubs_count   0.0008640717 0.003345590 0.00410668
-## log(traffic) 0.0282714233 0.096925339 0.12478020
+##                    Direct    Indirect       Total
+## log(POPDEN)  0.0135568314 0.045570373 0.059019640
+## canopy_per   0.0011583939 0.004007074 0.005044783
+## pubs_count   0.0008130794 0.002945901 0.003657471
+## log(traffic) 0.0311030505 0.102169568 0.132890602
 ## 
 ## Simulated z-values:
 ##                  Direct   Indirect      Total
-## log(POPDEN)  -0.8437652 -0.8125334 -0.8214128
-## canopy_per    4.2032121  3.8214551  3.9894450
-## pubs_count    4.7436779  4.1106696  4.3469403
-## log(traffic) -1.2689067 -1.2401407 -1.2507983
+## log(POPDEN)  -0.8450873 -0.8348932 -0.8387564
+## canopy_per    4.5949318  4.3640852  4.5214937
+## pubs_count    5.0298720  4.5651596  4.7951693
+## log(traffic) -1.1375718 -1.1250211 -1.1311926
 ## 
 ## Simulated p-values:
 ##              Direct     Indirect   Total     
-## log(POPDEN)  0.39880    0.41648565 0.41141   
-## canopy_per   2.6315e-05 0.00013267 6.6228e-05
-## pubs_count   2.0987e-06 3.9451e-05 1.3805e-05
-## log(traffic) 0.20447    0.21492336 0.21101</code></pre>
+## log(POPDEN)  0.39806    0.40378    0.40161   
+## canopy_per   4.3289e-06 1.2766e-05 6.1405e-06
+## pubs_count   4.9081e-07 4.9911e-06 1.6254e-06
+## log(traffic) 0.25530    0.26058    0.25797</code></pre>
 <p>The indirect effects in SAR, SAC, and SDM refer to global spillover effects. This means a change of <span class="math inline">\(x\)</span> in the focal units flows through the entire system of neighbours (direct nieightbours, neighbours of neighbours, …) influencing ‘their <span class="math inline">\(y\)</span>.’ One can think of this as diffusion or a change in a long-term equilibrium.</p>
 <p>For SLX models, nothing is gained from computing the impacts.</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">impacts</span>(hv_1.slx, <span class="at">listw =</span> queens.lw))</span></code></pre></div>
@@ -1279,7 +1279,7 @@ where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> 
 <pre><code>##    ***********************************************************************
 ##    *                       Package   GWmodel                             *
 ##    ***********************************************************************
-##    Program starts at: 2021-06-19 09:08:46 
+##    Program starts at: 2021-06-19 09:15:25 
 ##    Call:
 ##    gwr.basic(formula = formula, data = data, bw = bw, kernel = kernel, 
 ##     adaptive = adaptive, p = p, theta = theta, longlat = longlat, 
@@ -1348,7 +1348,7 @@ where <span class="math inline">\(\rho{\boldsymbol{\mathbf{W}}}\beta_k\)</span> 
 ##    Adjusted R-square value:  0.7235878 
 ## 
 ##    ***********************************************************************
-##    Program stops at: 2021-06-19 09:09:01</code></pre>
+##    Program stops at: 2021-06-19 09:15:38</code></pre>
 <p>The results give a range of coefficients for different locations. Let’s map those individual coefficients.</p>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spatial object</span></span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>gwr.spdf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(hv_1.gwr<span class="sc">$</span>SDF)</span>

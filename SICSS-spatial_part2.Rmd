@@ -326,7 +326,7 @@ Moreover, there are models combining two sets of the above specifications.
 
 $$
 		\begin{equation}
-		{\bm y}=\alpha{\bm \iota}+{\bm X}{\bm \beta}+{\bm W}{\bm X}{\bm \theta}+ {\bm \varepsilon}
+		{\bm y}=\alpha{\bm \iota}+\rho{\bm W}{\bm y}+{\bm X}{\bm \beta}+{\bm W}{\bm X}{\bm \theta}+ {\bm \varepsilon}
 		\end{equation}
 $$	
 
