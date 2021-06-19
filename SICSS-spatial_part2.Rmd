@@ -490,7 +490,7 @@ $$
 	where $\rho{\bm W}\beta_k$ equals the effect stemming from direct neighbours, $\rho^2{\bm W}^2\beta_k$ the effect stemming from second order neighbours (neighbours of neighbours),... This also includes feedback loops if unit $i$ is also a second order neighbour of itself.
 
 
-# Impacts
+### Impact measures
 
 Note that the derivative in SAR, SAC, and SDM is a $N \times N$ matrix, returning individual effects of each unit on each other unit, differentiated in _direct, indirect, and total impacts_. However, the individual effects (how $i$ influences $j$) mainly vary because of variation in ${\bm W}$. Usually, one should use summary measures to report effects in spatial models [@LeSage.2009.0]. @HalleckVega.2015.0 provide a nice summary of the impacts for each model:
 
