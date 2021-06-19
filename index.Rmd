@@ -17,6 +17,12 @@ bibliography: sicss-spatial.bib
 link-citations: yes
 ---
 
+---
+
+[Course Material](https://github.com/ruettenauer/SICSS-Spatial)
+
+---
+
 # Introduction
 
 This course material is designed for the Summer Institute in Computational Social Science (SICSS) Oxford. 

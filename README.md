@@ -6,6 +6,6 @@ The course is part of SICSS Oxford, see the full schedule here: https://sicss.io
 
 ---
 
-[Course materials](https://ruettenauer.github.io/SICSS-Spatial/index.html)
+[Slides](https://ruettenauer.github.io/SICSS-Spatial/index.html)
 
 ---
