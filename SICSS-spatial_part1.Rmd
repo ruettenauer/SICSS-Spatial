@@ -53,14 +53,6 @@ In its raw form, a pair of coordinates consists of two numerical values. For ins
 
 However, we need to specify a reference point for latitudes and longitudes (in the Figure above: equator and Greenwich). For instance, the pair of coordinates above comes from the Google Maps, which returns GPS coordinates in 'WGS 84' ([EPSG:4326](https://epsg.io/4326)). 
 
-## Projected CRS
-
-However, different data providers use different CRS. For instance, spatial data in the UK usually uses 'OSGB 1936 / British National Grid' ([EPSG:27700](https://epsg.io/27700)). Here, coordinates are in meters, and projected onto a planar 2D space. 
-
-There are a lot of different CRS projections, and different national statistics offices provide data in different projections. Data providers usually specify which reference system they use. This is important as using the correct reference system and projection is crucial for plotting and manipulating spatial data. 
-
-If you do not know the correct CRS, try starting with a standards CRS like [EPSG:4326](https://epsg.io/4326) if you have decimal degree like coordinates. If it looks like projected coordinates, try searching for the country or region in CRS libraries like https://epsg.io/. However, you must check if the projected coordinates match their real location, e.g. using `mpaview()`.
-
 ```{r}
 # Coordinate pairs of two locations
 coords1 <- c(51.752595, -1.262801)
@@ -83,6 +75,14 @@ nuffield.spdf <- st_as_sf(nuffield.df,
 mapview(nuffield.spdf, zcol = "name")
 
 ```
+
+## Projected CRS
+
+However, different data providers use different CRS. For instance, spatial data in the UK usually uses 'OSGB 1936 / British National Grid' ([EPSG:27700](https://epsg.io/27700)). Here, coordinates are in meters, and projected onto a planar 2D space. 
+
+There are a lot of different CRS projections, and different national statistics offices provide data in different projections. Data providers usually specify which reference system they use. This is important as using the correct reference system and projection is crucial for plotting and manipulating spatial data. 
+
+If you do not know the correct CRS, try starting with a standards CRS like [EPSG:4326](https://epsg.io/4326) if you have decimal degree like coordinates. If it looks like projected coordinates, try searching for the country or region in CRS libraries like https://epsg.io/. However, you must check if the projected coordinates match their real location, e.g. using `mpaview()`.
 
 ## Why different projections?
 
