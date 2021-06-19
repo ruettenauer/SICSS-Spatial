@@ -105,7 +105,7 @@ summary(hv_1.sar)
 hv_1.sem <- errorsarlm(log(Value) ~ log(POPDEN) + canopy_per + pubs_count + traffic,  
                      data = msoa.spdf, 
                      listw = queens.lw,
-                     Durbin = FALSE) # we could here extend to SDM
+                     Durbin = FALSE) # we could here extend to SDEM
 summary(hv_1.sem)
 
 
