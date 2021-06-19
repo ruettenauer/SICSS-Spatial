@@ -218,6 +218,9 @@ st_crs(trees.spdf) == st_crs(pubs.spdf)
 # MSOA in different crs --> transform
 msoa.spdf <- st_transform(msoa.spdf, crs = st_crs(trees.spdf))
 
+# Check if all geometries are valid, and make valid if needed
+msoa.spdf <- st_make_valid(msoa.spdf)
+
 ```
 
 ## Subsetting
@@ -397,7 +400,8 @@ plot(all_motor.var, all_motor.varfit)
 all_motor.varfit
 
 
-### Ordinary Kriging (ATTENTION: This can take some time!)
+### Ordinary Kriging 
+#(ATTENTION: This can take some time (~3-5min with current setting))
 
 all_motor.kg <- krige(all_motor_vehicles ~ 1,
                       locations = traffic.spdf,
