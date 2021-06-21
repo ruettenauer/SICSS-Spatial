@@ -1,7 +1,19 @@
 name: "SICSS Oxford - Introduction to geospatial data and analysis"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
-output_dir: "docs"
+output_dir: docs
+output: 
+  html_document:
+    theme: flatly
+    highlight: haddock
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 2
+theme: united
+bibliography: sicss-spatial.bib
+link-citations: yes
 navbar:
   title: "SICSS Oxford - Spatial"
   left:
@@ -13,3 +25,5 @@ navbar:
       href: SICSS-spatial_part2.html  
     - text: "Practical exercises"
       href: SICSS-spatial_part3.html  
+    - text: "Solutions"
+      href: SICSS-spatial_part3_solutions.html 

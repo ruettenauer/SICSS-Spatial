@@ -2,7 +2,7 @@
 title: "Part 1: Using and linking spatial data"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
-output_dir: "./docs"
+output_dir: docs
 output: 
   html_document:
     theme: flatly
@@ -349,6 +349,9 @@ traffic.spdf <- st_transform(traffic.spdf,
 
 # Map
 mapview(traffic.spdf[, "all_motor_vehicles"])
+
+# Save (for later exercise)
+save(traffic.spdf, file = "_data/traffic.RData")
 
 ```
 

@@ -2,7 +2,7 @@
 title: "Part 2: Analysing spatial data"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
-output_dir: "./docs"
+output_dir: docs
 output: 
   html_document:
     theme: flatly

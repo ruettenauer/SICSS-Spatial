@@ -2,7 +2,7 @@
 title: "SICSS Oxford - Introduction to geospatial data and analysis"
 author: "Tobias Rüttenauer"
 date: "June 19, 2021"
-output_dir: "./docs"
+output_dir: docs
 output: 
   html_document:
     theme: flatly
@@ -33,7 +33,7 @@ Instead of using exemplary data shipped with the packages, the course relies on 
 
 ### Why is spatial data linkage and analysis part of SICSS? 
 
-The amount of spatial ('readymade') data sources is steadily increasing. For instance, the UK open data portal provides many indactors on a spatially agrregated level: https://data.gov.uk/. Moreover, geographical information is increasingly available for traditional ('custommade') data sources, such as survey data. Using geographic information allows us to:
+The amount of spatial ('readymade') data sources is steadily increasing. For instance, the UK open data portal provides many indicators on a spatially agrregated level: https://data.gov.uk/. Moreover, geographical information is increasingly available for traditional ('custommade') data sources, such as survey data. Using geographic information allows us to:
 
 * Link information from different (unrelated) data sources
 
